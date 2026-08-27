@@ -182,11 +182,11 @@ Initial state:
 
 | Task                    | State   |
 | ----------------------- | ------- |
-| TASK-001 Backend CRUD   | READY   |
-| TASK-002 Frontend UI    | READY   |
-| TASK-003 Test Design    | READY   |
-| TASK-003 Test Execution | BLOCKED |
-| TASK-004 Review         | BLOCKED |
+| TASK-001 Backend CRUD   | DONE    |
+| TASK-002 Frontend UI    | DONE    |
+| TASK-003 Test Design    | DONE    |
+| TASK-003 Test Execution | DONE    |
+| TASK-004 Review         | REVIEW  |
 
 ## Integration Gate
 
