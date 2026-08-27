@@ -3,50 +3,59 @@
     {
       "id": "TASK-001",
       "name": "Backend CRUD",
+      "taskFile": "docs/tasks/TASK-001-backend-crud.md",
       "owner": "backend-worker",
       "state": "READY",
       "dependencies": [],
       "branch": "agent/task-001-backend-crud",
-      "worktree": "../TaskFlow-agent-backend",
+      "worktreeName": "TaskFlow-agent-backend",
       "scope": [
         "backend/taskflow-api/**"
       ],
       "verification": [
         "npm run build",
         "npm test"
-      ]
+      ],
+      "humanApprovalRequired": true,
+      "approved": false
     },
     {
       "id": "TASK-002",
       "name": "Frontend UI",
+      "taskFile": "docs/tasks/TASK-002-frontend-ui.md",
       "owner": "frontend-worker",
       "state": "READY",
       "dependencies": [],
       "branch": "agent/task-002-frontend-ui",
-      "worktree": "../TaskFlow-agent-frontend",
+      "worktreeName": "TaskFlow-agent-frontend",
       "scope": [
         "frontend/taskflow-web/**"
       ],
       "verification": [
         "npm run build"
-      ]
+      ],
+      "humanApprovalRequired": true,
+      "approved": false
     },
     {
       "id": "TASK-003",
       "name": "Backend Tests",
+      "taskFile": "docs/tasks/TASK-003-backend-tests.md",
       "owner": "testing-worker",
       "state": "BLOCKED",
       "dependencies": [
         "TASK-001"
       ],
       "branch": "agent/task-003-tests",
-      "worktree": "../TaskFlow-agent-tests",
+      "worktreeName": "TaskFlow-agent-tests",
       "scope": [
         "backend/taskflow-api/test/**"
       ],
       "verification": [
         "npm test"
-      ]
+      ],
+      "humanApprovalRequired": true,
+      "approved": false
     }
   ]
 }
