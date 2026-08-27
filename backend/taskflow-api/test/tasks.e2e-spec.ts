@@ -217,7 +217,10 @@ describe('Tasks API contract (e2e)', () => {
 
   describe('PATCH /api/tasks/:id', () => {
     it('updates the title and preserves unspecified fields', async () => {
-      const created = await createTask({ title: 'Old title', status: 'Pending' });
+      const created = await createTask({
+        title: 'Old title',
+        status: 'Pending',
+      });
       const response = await api()
         .patch(`/api/tasks/${created.id}`)
         .send({ title: 'Updated task title' })
@@ -288,17 +291,23 @@ describe('Tasks API contract (e2e)', () => {
       ],
       ['an invalid status', { status: 'Finished' }],
       ['an unexpected property', { isAdmin: true }],
-    ])('rejects %s and leaves the existing task unchanged', async (_case, body) => {
-      const created = await createTask({ title: 'Original title', status: 'Pending' });
-      const response = await api()
-        .patch(`/api/tasks/${created.id}`)
-        .send(body)
-        .expect(400);
-      expectSafeError(response.body, 400);
-      expect((await api().get(`/api/tasks/${created.id}`).expect(200)).body).toEqual(
-        created,
-      );
-    });
+    ])(
+      'rejects %s and leaves the existing task unchanged',
+      async (_case, body) => {
+        const created = await createTask({
+          title: 'Original title',
+          status: 'Pending',
+        });
+        const response = await api()
+          .patch(`/api/tasks/${created.id}`)
+          .send(body)
+          .expect(400);
+        expectSafeError(response.body, 400);
+        expect(
+          (await api().get(`/api/tasks/${created.id}`).expect(200)).body,
+        ).toEqual(created);
+      },
+    );
 
     it('returns 400 for an invalid ObjectId', async () => {
       const response = await api()
@@ -320,17 +329,23 @@ describe('Tasks API contract (e2e)', () => {
   describe('DELETE /api/tasks/:id', () => {
     it('deletes an existing task with an empty 204 response', async () => {
       const created = await createTask();
-      const response = await api().delete(`/api/tasks/${created.id}`).expect(204);
+      const response = await api()
+        .delete(`/api/tasks/${created.id}`)
+        .expect(204);
       expect(response.text).toBe('');
     });
 
     it('returns 400 for an invalid ObjectId', async () => {
-      const response = await api().delete('/api/tasks/not-a-valid-id').expect(400);
+      const response = await api()
+        .delete('/api/tasks/not-a-valid-id')
+        .expect(400);
       expectSafeError(response.body, 400);
     });
 
     it('returns 404 when deleting a missing task', async () => {
-      const response = await api().delete(`/api/tasks/${missingId()}`).expect(404);
+      const response = await api()
+        .delete(`/api/tasks/${missingId()}`)
+        .expect(404);
       expectSafeError(response.body, 404);
     });
 
