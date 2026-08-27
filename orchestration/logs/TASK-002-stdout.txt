@@ -1,0 +1,4265 @@
+2026-08-27T11:34:18.856289Z ERROR codex_models_manager::manager: failed to load models cache: EOF while parsing a value at line 1 column 0
+OpenAI Codex v0.150.1
+--------
+workdir: D:\Projects\AI_AGENTIC_DEV_PROJECT\TaskFlow-agent-frontend
+model: gpt-5.6-sol
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR]
+reasoning effort: none
+reasoning summaries: none
+session id: 01a042ff-dc62-7f12-9f8e-3a9283f48cac
+--------
+user
+You are Frontend Implementation Worker for TaskFlow.
+
+You are running in an isolated Git worktree.
+
+Read first:
+
+- AGENTS.md
+- docs/requirements.md
+- docs/acceptance-criteria.md
+- docs/api-contract.md
+- docs/architecture.md
+- docs/tasks/TASK-002-frontend-ui.md
+
+Assigned task:
+
+TASK-002 ??? Frontend UI
+
+Allowed modification scope:
+
+- frontend/taskflow-web/**
+
+Do not modify:
+
+- backend/**
+- docs/**
+- AGENTS.md
+
+Before editing:
+
+1. Inspect the current implementation.
+2. Confirm the relevant architecture and contract requirements.
+3. Identify the files you expect to modify.
+4. Report blockers or contract conflicts.
+5. Do not silently expand scope.
+
+Then implement the assigned task.
+
+Do not modify shared contracts or architecture.
+
+Verification:
+
+- npm run build
+
+If verification fails because of your changes:
+- investigate the cause
+- fix only issues caused by or directly required by the assigned task
+- rerun verification
+
+Do not weaken correct tests merely to make them pass.
+
+Completion report:
+
+- files changed
+- implementation summary
+- packages changed
+- verification commands executed
+- verification results
+- assumptions
+- blockers
+- unresolved issues
+- confirmation that scope was respected
+
+Do not merge into main.
+Do not delete branches or worktrees.
+
+
+
+codex
+I’ll first inspect the required documentation and the existing frontend, then I’ll report the expected file changes and any contract or architecture issues before editing. I’ll keep all modifications within `frontend/taskflow-web/**`.
+exec
+"C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'Get-Content -Raw AGENTS.md; Get-Content -Raw docs/requirements.md; Get-Content -Raw docs/acceptance-criteria.md; Get-Content -Raw docs/api-contract.md; Get-Content -Raw docs/architecture.md; Get-Content -Raw docs/tasks/TASK-002-frontend-ui.md' in D:\Projects\AI_AGENTIC_DEV_PROJECT\TaskFlow-agent-frontend
+ succeeded in 90ms:
+# TaskFlow Agent Instructions
+
+## 1. Project Purpose
+
+TaskFlow is a small task-management application used to practice professional AI-assisted and agentic software development.
+
+The project intentionally focuses on:
+
+* agent task decomposition
+* parallel agent development
+* orchestration
+* Git worktree isolation
+* contract-first development
+* automated verification
+* AI-assisted code review
+* human-in-the-loop approval
+
+The application itself should remain intentionally simple.
+
+---
+
+## 2. Technology Stack
+
+### Backend
+
+* NestJS
+* TypeScript
+* Mongoose
+* MongoDB
+* class-validator
+* class-transformer
+* @nestjs/config
+* Jest
+
+### Frontend
+
+* React
+* TypeScript
+* Vite
+
+---
+
+## 3. Repository Structure
+
+Primary repository areas:
+
+```text
+backend/
+frontend/
+docs/
+```
+
+Backend implementation is located under:
+
+```text
+backend/
+```
+
+Frontend implementation is located under:
+
+```text
+frontend/
+```
+
+Project requirements and architecture documentation are located under:
+
+```text
+docs/
+```
+
+---
+
+## 4. Important Documentation
+
+Before modifying relevant functionality, inspect the appropriate documents.
+
+### Business requirements
+
+```text
+docs/requirements.md
+```
+
+Defines what TaskFlow must do.
+
+### Acceptance criteria
+
+```text
+docs/acceptance-criteria.md
+```
+
+Defines how required behavior is verified.
+
+### API contract
+
+```text
+docs/api-contract.md
+```
+
+Defines communication between backend, frontend, and automated tests.
+
+### Architecture
+
+```text
+docs/architecture.md
+```
+
+Defines approved application architecture and engineering boundaries.
+
+---
+
+## 5. Source-of-Truth Rules
+
+Use the following precedence when implementation assumptions conflict:
+
+1. Explicit task instructions from the human orchestrator
+2. Approved API contract
+3. Approved requirements
+4. Approved architecture
+5. Existing implementation conventions
+
+If two approved documents appear to conflict:
+
+* do not guess
+* do not silently choose one
+* report the conflict
+* explain the impact
+* wait for human direction when the conflict affects behavior
+
+---
+
+## 6. Architecture Rules
+
+Approved backend flow:
+
+```text
+HTTP Request
+â†’ Controller
+â†’ DTO Validation
+â†’ Service
+â†’ Mongoose Model
+â†’ MongoDB
+```
+
+Approved frontend flow:
+
+```text
+React Components
+â†’ Task API Client
+â†’ REST API
+```
+
+Do not introduce unnecessary architectural layers.
+
+Do not introduce any of the following unless explicitly approved:
+
+* custom repository abstraction
+* CQRS
+* event sourcing
+* microservices
+* message queues
+* Redis
+* GraphQL
+* WebSockets
+* Redux
+* complex domain-driven design layers
+* unit-of-work abstraction
+
+Prefer the simplest implementation that satisfies the current requirements.
+
+---
+
+## 7. Backend Engineering Rules
+
+When modifying backend code:
+
+* follow NestJS module/controller/provider conventions
+* use dependency injection
+* keep controllers thin
+* place application behavior in services
+* use DTO classes for external input
+* use `class-validator` for request validation
+* use Mongoose through `@nestjs/mongoose`
+* use asynchronous APIs for I/O
+* validate MongoDB ObjectIds before database operations when required by the API contract
+* return correct HTTP status codes
+* preserve the public API contract
+* do not expose internal MongoDB implementation details unnecessarily
+* do not expose `_id` as the public task identifier
+* do not hardcode database connection strings
+* do not commit secrets
+
+---
+
+## 8. Validation Rules
+
+Backend validation is mandatory.
+
+Global NestJS validation should provide behavior equivalent to:
+
+```typescript
+new ValidationPipe({
+  whitelist: true,
+  forbidNonWhitelisted: true,
+  transform: true,
+})
+```
+
+Unsupported request properties must be rejected.
+
+Frontend validation may improve user experience but does not replace backend validation.
+
+---
+
+## 9. Mongoose Rules
+
+When working with MongoDB/Mongoose:
+
+* define schemas explicitly
+* use Mongoose timestamps for `createdAt` and `updatedAt`
+* constrain task status using the approved status values
+* avoid unnecessary `populate`
+* avoid unnecessary database queries
+* do not expose raw Mongoose/database errors to API clients
+* do not hardcode MongoDB credentials or connection strings
+
+Supported task statuses:
+
+```text
+Pending
+InProgress
+Completed
+```
+
+Do not introduce additional statuses without approved contract changes.
+
+---
+
+## 10. Frontend Engineering Rules
+
+When modifying frontend code:
+
+* use React function components
+* use TypeScript
+* use the public API contract defined in `docs/api-contract.md`
+* centralize API communication
+* do not duplicate backend URLs across components
+* use `VITE_API_BASE_URL` for backend configuration
+* maintain type-safe task models
+* handle loading states
+* handle API failures
+* provide an empty-state UI
+* keep components focused
+* do not introduce global state-management libraries unless explicitly approved
+
+Frontend components must use:
+
+```text
+id
+```
+
+and must not depend on MongoDB:
+
+```text
+_id
+```
+
+---
+
+## 11. API Contract Governance
+
+The API contract is defined by:
+
+```text
+docs/api-contract.md
+```
+
+Implementation agents must not silently change:
+
+* endpoint paths
+* HTTP methods
+* request fields
+* response fields
+* status values
+* error behavior
+* expected HTTP status codes
+
+If a contract change appears necessary:
+
+1. identify the conflicting requirement
+2. explain why the existing contract is insufficient
+3. describe the proposed change
+4. describe affected agents/components
+5. wait for human approval
+
+---
+
+## 12. Architecture Governance
+
+Implementation agents do not independently own architecture decisions.
+
+If the approved architecture prevents a required implementation:
+
+1. explain the current limitation
+2. propose the smallest architecture change
+3. explain consequences
+4. do not perform the architecture change without approval
+
+Do not describe unnecessary architectural additions as improvements merely because they are common patterns.
+
+---
+
+## 13. Agent Scope
+
+Agents should primarily modify only the scope assigned in their task.
+
+Typical ownership:
+
+### Backend Agent
+
+```text
+backend/**
+```
+
+### Frontend Agent
+
+```text
+frontend/**
+```
+
+### Testing Agent
+
+Testing-related files explicitly assigned by the orchestrator.
+
+### Reviewer Agent
+
+Read-only unless explicitly assigned fixes.
+
+Shared files such as:
+
+```text
+docs/api-contract.md
+docs/architecture.md
+AGENTS.md
+```
+
+must not be modified unless the task explicitly grants permission.
+
+---
+
+## 14. Scope Expansion Rule
+
+If completing a task appears to require changes outside assigned scope:
+
+Do not immediately modify the additional area.
+
+Instead:
+
+1. identify the required out-of-scope change
+2. explain why it is needed
+3. explain the likely impact
+4. request approval or report it as a blocker
+
+Small changes strictly required for compilation may be proposed, but should still be reported.
+
+---
+
+## 15. Before Coding
+
+Before making modifications:
+
+1. Read this `AGENTS.md`.
+2. Read documentation relevant to the task.
+3. Inspect the existing implementation.
+4. Identify affected files.
+5. Confirm the requested behavior.
+6. Determine the smallest appropriate implementation.
+
+Do not begin by rewriting large sections of the repository.
+
+---
+
+## 16. Implementation Principle
+
+Prefer:
+
+```text
+smallest correct change
+```
+
+over:
+
+```text
+largest comprehensive rewrite
+```
+
+Preserve existing working behavior unless requirements explicitly change it.
+
+Do not refactor unrelated code during feature implementation.
+
+---
+
+## 17. Verification
+
+An implementation is not complete simply because code was written.
+
+### Backend
+
+Run the appropriate commands from the backend project:
+
+```bash
+npm run build
+npm test
+```
+
+Run additional relevant tests when available.
+
+### Frontend
+
+Run the appropriate commands from the frontend project:
+
+```bash
+npm run build
+```
+
+Run frontend tests when such tests exist and are relevant.
+
+Agents must not state that a command passed unless the command was actually executed successfully.
+
+---
+
+## 18. Handling Test Failures
+
+If a test fails after an agent change:
+
+1. investigate the failure
+2. determine whether the implementation or test is incorrect
+3. do not automatically weaken or delete tests
+4. preserve documented behavior
+5. fix failures caused by the assigned change when possible
+6. report unresolved failures
+
+Never modify a correct contract test merely to make an incorrect implementation pass.
+
+---
+
+## 19. Error Handling
+
+Expected errors should be represented using appropriate NestJS HTTP exceptions or equivalent behavior.
+
+Do not expose:
+
+* stack traces
+* credentials
+* MongoDB connection strings
+* internal file-system paths
+* sensitive environment data
+
+to normal API clients.
+
+---
+
+## 20. Security Rules
+
+Agents must not:
+
+* commit secrets
+* hardcode credentials
+* disable validation to make tests pass
+* weaken security behavior without explicit approval
+* expose internal errors unnecessarily
+* execute destructive production commands
+* assume production access is available
+
+This repository should be treated as a development environment unless explicitly stated otherwise.
+
+---
+
+## 21. Git Rules
+
+Do not:
+
+* force-push branches
+* rewrite unrelated history
+* delete branches without instruction
+* commit unrelated changes
+* modify another agent's worktree
+* commit generated secrets or environment files
+
+Keep changes scoped and reviewable.
+
+When working in a dedicated agent branch/worktree, operate only within that assigned worktree.
+
+---
+
+## 22. Parallel Agent Rules
+
+When multiple agents are working concurrently:
+
+* respect assigned ownership boundaries
+* do not modify shared contracts unless explicitly authorized
+* do not assume another agent's unfinished implementation
+* rely on approved shared documentation for integration behavior
+* report dependencies or blockers
+* avoid touching files owned by another active agent
+
+Independent tasks may run in parallel.
+
+Dependent tasks must synchronize before integration.
+
+---
+
+## 23. Human-in-the-Loop Rule
+
+Agents may:
+
+* inspect code
+* propose solutions
+* modify assigned files
+* run approved development commands
+* execute tests/builds
+* review changes
+
+Agents do not have final authority to:
+
+* redefine requirements
+* change shared API contracts
+* redefine architecture
+* merge into the protected primary branch
+* deploy to production
+
+Final acceptance belongs to the human engineer/orchestrator.
+
+---
+
+## 24. Review Expectations
+
+Agent-generated changes should be reviewed for:
+
+* correctness
+* API contract compliance
+* architecture compliance
+* security
+* input validation
+* database behavior
+* performance
+* maintainability
+* unnecessary complexity
+* test quality
+* unrelated changes
+
+Passing tests alone does not prove a change is production-ready.
+
+---
+
+## 25. Completion Report
+
+At the end of an assigned implementation task, report:
+
+### Files changed
+
+List modified files.
+
+### Implementation summary
+
+Explain what was implemented.
+
+### Verification
+
+List commands actually executed.
+
+Example:
+
+```text
+npm run build â€” passed
+npm test â€” passed
+```
+
+### Assumptions
+
+List assumptions made during implementation.
+
+### Unresolved issues
+
+List blockers, failures, risks, or follow-up work.
+
+### Scope
+
+Confirm whether any files outside the assigned scope were modified.
+
+---
+
+## 26. Definition of Done for Agent Work
+
+Agent work is considered ready for human review when:
+
+1. Assigned functionality has been implemented.
+2. Relevant requirements have been followed.
+3. API contract has been preserved.
+4. Architecture has been preserved.
+5. Relevant build succeeds.
+6. Relevant tests pass or failures are clearly reported.
+7. No unnecessary scope expansion occurred.
+8. No secrets were introduced.
+9. Changed files are summarized.
+10. Assumptions and unresolved issues are reported.
+
+Human review and approval are still required before merge.
+
+# TaskFlow Requirements
+
+## 1. Project Purpose
+
+TaskFlow is a small task management application created to practice
+agentic software development, parallel AI agents, orchestration,
+worktree isolation, automated verification, and human-in-the-loop review.
+
+The application itself should remain intentionally simple.
+
+---
+
+## 2. Technology Stack
+
+### Backend
+- NestJS
+- TypeScript
+- Mongoose
+- MongoDB
+
+### Frontend
+- React
+- TypeScript
+- Vite
+
+### Testing
+- Jest
+- NestJS testing utilities
+
+---
+
+## 3. Functional Requirements
+
+### FR-01 Create Task
+
+A user must be able to create a task.
+
+A task contains:
+
+- id
+- title
+- description
+- status
+- createdAt
+- updatedAt
+
+Rules:
+
+- title is required
+- title must not contain only whitespace
+- title maximum length is 150 characters
+- description is optional
+- description maximum length is 1000 characters
+- status is optional when creating a task
+- default status is Pending
+
+---
+
+### FR-02 View All Tasks
+
+A user must be able to retrieve all tasks.
+
+Each returned task must contain:
+
+- id
+- title
+- description
+- status
+- createdAt
+- updatedAt
+
+The MongoDB `_id` field must not be exposed as the public API identifier.
+
+---
+
+### FR-03 View One Task
+
+A user must be able to retrieve a task by its id.
+
+If the id does not belong to an existing task:
+
+- return HTTP 404
+
+If the supplied id is not a valid MongoDB ObjectId:
+
+- return HTTP 400
+
+---
+
+### FR-04 Update Task
+
+A user must be able to update one or more of:
+
+- title
+- description
+- status
+
+Validation rules must also apply during updates.
+
+If the task does not exist:
+
+- return HTTP 404
+
+---
+
+### FR-05 Delete Task
+
+A user must be able to delete a task by id.
+
+If the task does not exist:
+
+- return HTTP 404
+
+After deletion, the task must no longer appear in task queries.
+
+---
+
+## 4. Task Statuses
+
+Supported statuses are:
+
+- Pending
+- InProgress
+- Completed
+
+No other status value is valid.
+
+---
+
+## 5. API Requirements
+
+The backend must provide:
+
+GET /api/tasks
+
+GET /api/tasks/:id
+
+POST /api/tasks
+
+PATCH /api/tasks/:id
+
+DELETE /api/tasks/:id
+
+---
+
+## 6. Frontend Requirements
+
+The frontend must provide:
+
+- task list
+- create task form
+- edit task capability
+- delete task capability
+- status update capability
+- loading state
+- error state
+- empty-state message when there are no tasks
+
+The frontend must interact with the backend through a dedicated API client module.
+
+API URLs must not be duplicated across components.
+
+---
+
+## 7. Validation Requirements
+
+Backend validation is mandatory.
+
+Frontend validation may improve usability but must never replace backend validation.
+
+Invalid input must not reach MongoDB persistence.
+
+---
+
+## 8. Error Handling Requirements
+
+Expected API behavior:
+
+### Invalid request
+HTTP 400
+
+### Task not found
+HTTP 404
+
+### Successful creation
+HTTP 201
+
+### Successful retrieval/update
+HTTP 200
+
+### Successful deletion
+HTTP 204
+
+Unexpected server errors should not expose stack traces or sensitive implementation details to API clients.
+
+---
+
+## 9. Persistence Requirements
+
+Task data must be persisted in MongoDB using Mongoose.
+
+Mongoose timestamps should be used for:
+
+- createdAt
+- updatedAt
+
+Database connection strings must come from environment configuration.
+
+No credentials or secrets may be committed to Git.
+
+---
+
+## 10. Non-Functional Requirements
+
+### Maintainability
+
+- Follow normal NestJS conventions.
+- Keep controllers thin.
+- Put application logic in services.
+- Avoid unnecessary architecture.
+
+### Security
+
+- Validate all external input.
+- Do not hardcode secrets.
+- Do not expose raw database errors unnecessarily.
+- Do not expose MongoDB implementation details unnecessarily.
+
+### Performance
+
+For the initial project:
+
+- avoid unnecessary database queries
+- avoid unnecessary Mongoose populate operations
+- do not load unrelated collections
+
+Advanced optimization is outside the initial project scope.
+
+### Testability
+
+Important backend behavior must be covered by automated tests.
+
+---
+
+## 11. Out of Scope
+
+The initial version will NOT include:
+
+- authentication
+- authorization
+- user accounts
+- role management
+- notifications
+- file uploads
+- WebSockets
+- microservices
+- queues
+- Redis
+- Redux
+- CQRS
+- event sourcing
+- production deployment
+
+These may be introduced later only when they support a specific
+agentic-development exercise.
+
+---
+
+## 12. Definition of Done
+
+A feature is considered complete only when:
+
+1. Requirements are satisfied.
+2. API contract is preserved.
+3. Relevant build succeeds.
+4. Relevant automated tests pass.
+5. No unrelated files are changed.
+6. Generated code has been reviewed.
+7. Known assumptions and limitations are documented.
+8. Human approval is given before merging.
+# TaskFlow Acceptance Criteria
+
+## AC-01 â€” Create a Valid Task
+
+### Given
+
+A valid request body:
+
+```json
+{
+  "title": "Learn Codex",
+  "description": "Practice agentic development"
+}
+```
+
+### When
+
+The client sends:
+
+```http
+POST /api/tasks
+```
+
+### Then
+
+* Response status must be `201 Created`.
+* A new task must be persisted in MongoDB.
+* The response must contain the created task.
+* The task must contain an `id`.
+* The task must contain `createdAt`.
+* The task must contain `updatedAt`.
+* If `status` is not provided, it must default to `Pending`.
+* The public response must expose `id`, not MongoDB `_id`.
+
+---
+
+## AC-02 â€” Create a Task with an Explicit Status
+
+### Given
+
+```json
+{
+  "title": "Build backend",
+  "description": "Implement the NestJS API",
+  "status": "InProgress"
+}
+```
+
+### When
+
+The client sends:
+
+```http
+POST /api/tasks
+```
+
+### Then
+
+* Response status must be `201 Created`.
+* The task must be persisted.
+* The returned status must be `InProgress`.
+
+---
+
+## AC-03 â€” Reject a Missing Title
+
+### Given
+
+```json
+{
+  "description": "Task without a title"
+}
+```
+
+### When
+
+The client sends:
+
+```http
+POST /api/tasks
+```
+
+### Then
+
+* Response status must be `400 Bad Request`.
+* No task must be persisted.
+
+---
+
+## AC-04 â€” Reject an Empty Title
+
+### Given
+
+```json
+{
+  "title": ""
+}
+```
+
+### When
+
+The client sends:
+
+```http
+POST /api/tasks
+```
+
+### Then
+
+* Response status must be `400 Bad Request`.
+* No task must be persisted.
+
+---
+
+## AC-05 â€” Reject a Whitespace-Only Title
+
+### Given
+
+```json
+{
+  "title": "   "
+}
+```
+
+### When
+
+The client sends:
+
+```http
+POST /api/tasks
+```
+
+### Then
+
+* Response status must be `400 Bad Request`.
+* No task must be persisted.
+
+---
+
+## AC-06 â€” Reject a Title Longer Than 150 Characters
+
+### Given
+
+A task title containing more than 150 characters.
+
+### When
+
+The client sends:
+
+```http
+POST /api/tasks
+```
+
+### Then
+
+* Response status must be `400 Bad Request`.
+* No task must be persisted.
+
+---
+
+## AC-07 â€” Accept a 150-Character Title
+
+### Given
+
+A task title containing exactly 150 characters.
+
+### When
+
+The client sends:
+
+```http
+POST /api/tasks
+```
+
+### Then
+
+* Response status must be `201 Created`.
+* The task must be persisted.
+
+---
+
+## AC-08 â€” Description Is Optional
+
+### Given
+
+```json
+{
+  "title": "Task without description"
+}
+```
+
+### When
+
+The client sends:
+
+```http
+POST /api/tasks
+```
+
+### Then
+
+* Response status must be `201 Created`.
+* The task must be persisted successfully.
+
+---
+
+## AC-09 â€” Reject a Description Longer Than 1000 Characters
+
+### Given
+
+A task description containing more than 1000 characters.
+
+### When
+
+The client sends:
+
+```http
+POST /api/tasks
+```
+
+### Then
+
+* Response status must be `400 Bad Request`.
+* No task must be persisted.
+
+---
+
+## AC-10 â€” Default Task Status
+
+### Given
+
+```json
+{
+  "title": "Learn agentic development"
+}
+```
+
+### When
+
+The task is created without a `status`.
+
+### Then
+
+The stored and returned task status must be:
+
+```text
+Pending
+```
+
+---
+
+## AC-11 â€” Accept Supported Status Values
+
+The API must accept these status values:
+
+```text
+Pending
+InProgress
+Completed
+```
+
+For each supported value:
+
+* Task creation must succeed.
+* Task update must succeed.
+* The stored value must match the requested value.
+
+---
+
+## AC-12 â€” Reject an Invalid Status
+
+### Given
+
+```json
+{
+  "title": "Invalid status test",
+  "status": "Started"
+}
+```
+
+### When
+
+The client sends:
+
+```http
+POST /api/tasks
+```
+
+### Then
+
+* Response status must be `400 Bad Request`.
+* No task must be persisted.
+
+---
+
+## AC-13 â€” Reject Unexpected Properties
+
+### Given
+
+```json
+{
+  "title": "Test",
+  "status": "Pending",
+  "isAdmin": true
+}
+```
+
+### When
+
+The client sends the request to an endpoint that accepts task input.
+
+### Then
+
+The backend must reject properties that are not part of the supported task input contract.
+
+Expected status:
+
+```text
+400 Bad Request
+```
+
+This assumes the NestJS validation configuration uses whitelist validation with unknown properties forbidden.
+
+---
+
+## AC-14 â€” Retrieve All Tasks
+
+### Given
+
+One or more tasks exist.
+
+### When
+
+The client sends:
+
+```http
+GET /api/tasks
+```
+
+### Then
+
+* Response status must be `200 OK`.
+* Response body must be an array.
+* Every task must follow the documented public task structure.
+
+Example:
+
+```json
+[
+  {
+    "id": "68abc123",
+    "title": "Learn Codex",
+    "description": "Practice agentic development",
+    "status": "Pending",
+    "createdAt": "2026-08-24T02:30:00.000Z",
+    "updatedAt": "2026-08-24T02:30:00.000Z"
+  }
+]
+```
+
+---
+
+## AC-15 â€” Retrieve Tasks When None Exist
+
+### Given
+
+There are no tasks in the database.
+
+### When
+
+The client sends:
+
+```http
+GET /api/tasks
+```
+
+### Then
+
+* Response status must be `200 OK`.
+* Response body must be:
+
+```json
+[]
+```
+
+An empty task collection must not result in `404`.
+
+---
+
+## AC-16 â€” Do Not Expose MongoDB `_id`
+
+### Given
+
+A task exists in MongoDB.
+
+### When
+
+The task is returned from any public API endpoint.
+
+### Then
+
+The public response must contain:
+
+```json
+{
+  "id": "..."
+}
+```
+
+and must not expose MongoDB's `_id` field as the public identifier.
+
+---
+
+## AC-17 â€” Retrieve One Existing Task
+
+### Given
+
+A task exists with a valid identifier.
+
+### When
+
+The client sends:
+
+```http
+GET /api/tasks/:id
+```
+
+### Then
+
+* Response status must be `200 OK`.
+* The correct task must be returned.
+* The returned `id` must match the requested task.
+* The response must follow the documented task response format.
+
+---
+
+## AC-18 â€” Reject an Invalid MongoDB ObjectId
+
+### Given
+
+An invalid identifier such as:
+
+```text
+not-a-valid-id
+```
+
+### When
+
+The client sends:
+
+```http
+GET /api/tasks/not-a-valid-id
+```
+
+### Then
+
+* Response status must be `400 Bad Request`.
+* The application must not expose an internal Mongoose stack trace or raw database error.
+
+---
+
+## AC-19 â€” Return 404 for a Missing Task
+
+### Given
+
+A syntactically valid MongoDB ObjectId that does not correspond to a task.
+
+### When
+
+The client sends:
+
+```http
+GET /api/tasks/:id
+```
+
+### Then
+
+Response status must be:
+
+```text
+404 Not Found
+```
+
+---
+
+## AC-20 â€” Update a Task Title
+
+### Given
+
+An existing task.
+
+### When
+
+The client sends:
+
+```http
+PATCH /api/tasks/:id
+```
+
+with:
+
+```json
+{
+  "title": "Updated task title"
+}
+```
+
+### Then
+
+* Response status must be `200 OK`.
+* The title must be updated.
+* Other task properties must remain unchanged unless explicitly supplied.
+* `updatedAt` must reflect the update.
+
+---
+
+## AC-21 â€” Update a Task Description
+
+### Given
+
+An existing task.
+
+### When
+
+The client sends:
+
+```http
+PATCH /api/tasks/:id
+```
+
+with:
+
+```json
+{
+  "description": "Updated task description"
+}
+```
+
+### Then
+
+* Response status must be `200 OK`.
+* The description must be updated.
+* Unspecified fields must remain unchanged.
+
+---
+
+## AC-22 â€” Update Task Status
+
+### Given
+
+An existing task with:
+
+```text
+Pending
+```
+
+### When
+
+The client sends:
+
+```http
+PATCH /api/tasks/:id
+```
+
+with:
+
+```json
+{
+  "status": "Completed"
+}
+```
+
+### Then
+
+* Response status must be `200 OK`.
+* The status must become `Completed`.
+* `updatedAt` must change.
+
+---
+
+## AC-23 â€” Support Partial Updates
+
+### Given
+
+An existing task.
+
+### When
+
+The client sends only one supported field:
+
+```json
+{
+  "status": "InProgress"
+}
+```
+
+### Then
+
+The API must not require:
+
+* title
+* description
+* other task fields
+
+A `PATCH` operation must support partial modification.
+
+---
+
+## AC-24 â€” Reject Invalid Status During Update
+
+### Given
+
+An existing task.
+
+### When
+
+The client sends:
+
+```json
+{
+  "status": "Finished"
+}
+```
+
+to:
+
+```http
+PATCH /api/tasks/:id
+```
+
+### Then
+
+* Response status must be `400 Bad Request`.
+* The existing task must not be changed.
+
+---
+
+## AC-25 â€” Reject an Empty Title During Update
+
+### Given
+
+An existing task.
+
+### When
+
+The client sends:
+
+```json
+{
+  "title": ""
+}
+```
+
+### Then
+
+* Response status must be `400 Bad Request`.
+* The existing title must remain unchanged.
+
+---
+
+## AC-26 â€” Reject a Whitespace-Only Title During Update
+
+### Given
+
+An existing task.
+
+### When
+
+The client sends:
+
+```json
+{
+  "title": "   "
+}
+```
+
+### Then
+
+* Response status must be `400 Bad Request`.
+* The existing task must remain unchanged.
+
+---
+
+## AC-27 â€” Reject an Oversized Description During Update
+
+### Given
+
+An existing task.
+
+### When
+
+A description containing more than 1000 characters is submitted.
+
+### Then
+
+* Response status must be `400 Bad Request`.
+* Existing persisted data must remain unchanged.
+
+---
+
+## AC-28 â€” Reject Invalid ObjectId During Update
+
+### When
+
+The client sends:
+
+```http
+PATCH /api/tasks/not-a-valid-id
+```
+
+### Then
+
+Response status must be:
+
+```text
+400 Bad Request
+```
+
+---
+
+## AC-29 â€” Return 404 When Updating a Missing Task
+
+### Given
+
+A valid MongoDB ObjectId that does not correspond to a task.
+
+### When
+
+The client sends:
+
+```http
+PATCH /api/tasks/:id
+```
+
+### Then
+
+Response status must be:
+
+```text
+404 Not Found
+```
+
+---
+
+## AC-30 â€” Delete an Existing Task
+
+### Given
+
+An existing task.
+
+### When
+
+The client sends:
+
+```http
+DELETE /api/tasks/:id
+```
+
+### Then
+
+* Response status must be `204 No Content`.
+* The task must be removed from MongoDB.
+* The response must not contain a task body.
+
+---
+
+## AC-31 â€” Deleted Task Must No Longer Be Returned
+
+### Given
+
+A task was successfully deleted.
+
+### When
+
+The client subsequently sends:
+
+```http
+GET /api/tasks/:id
+```
+
+### Then
+
+Response status must be:
+
+```text
+404 Not Found
+```
+
+The deleted task must also no longer appear in:
+
+```http
+GET /api/tasks
+```
+
+---
+
+## AC-32 â€” Reject Invalid ObjectId During Delete
+
+### When
+
+The client sends:
+
+```http
+DELETE /api/tasks/not-a-valid-id
+```
+
+### Then
+
+Response status must be:
+
+```text
+400 Bad Request
+```
+
+---
+
+## AC-33 â€” Return 404 When Deleting a Missing Task
+
+### Given
+
+A valid MongoDB ObjectId that does not correspond to an existing task.
+
+### When
+
+The client sends:
+
+```http
+DELETE /api/tasks/:id
+```
+
+### Then
+
+Response status must be:
+
+```text
+404 Not Found
+```
+
+---
+
+# Frontend Acceptance Criteria
+
+## AC-34 â€” Display Task List
+
+### Given
+
+Tasks are returned by the backend.
+
+### When
+
+The user opens TaskFlow.
+
+### Then
+
+The frontend must display the tasks.
+
+Each task should visibly provide at least:
+
+* title
+* description when available
+* status
+
+---
+
+## AC-35 â€” Display Empty State
+
+### Given
+
+The backend returns:
+
+```json
+[]
+```
+
+### When
+
+The task list loads.
+
+### Then
+
+The frontend must display a clear empty-state message rather than rendering an error.
+
+---
+
+## AC-36 â€” Display Loading State
+
+### Given
+
+A request to the API is currently pending.
+
+### Then
+
+The frontend must provide a visible loading state.
+
+---
+
+## AC-37 â€” Display API Error State
+
+### Given
+
+A task request fails.
+
+### Then
+
+The frontend must display a user-understandable error state.
+
+The UI must not expose raw server stack traces.
+
+---
+
+## AC-38 â€” Create Task from Frontend
+
+### Given
+
+The user enters valid task information.
+
+### When
+
+The user submits the create-task form.
+
+### Then
+
+* The frontend must send the correct `POST /api/tasks` request.
+* The created task must appear in the UI after successful creation.
+* The user must receive appropriate feedback if creation fails.
+
+---
+
+## AC-39 â€” Frontend Must Prevent Obviously Invalid Task Creation
+
+### Given
+
+The task title is missing or empty.
+
+### When
+
+The user attempts to submit the create form.
+
+### Then
+
+The frontend should prevent submission and show an appropriate validation message.
+
+Backend validation remains mandatory regardless of frontend validation.
+
+---
+
+## AC-40 â€” Edit Task from Frontend
+
+### Given
+
+A task exists.
+
+### When
+
+The user edits its supported fields.
+
+### Then
+
+* The frontend must send the appropriate `PATCH /api/tasks/:id` request.
+* The updated values must appear after a successful response.
+
+---
+
+## AC-41 â€” Change Status from Frontend
+
+The user must be able to change a task between:
+
+```text
+Pending
+InProgress
+Completed
+```
+
+After a successful backend response, the new status must be reflected in the UI.
+
+---
+
+## AC-42 â€” Delete Task from Frontend
+
+### Given
+
+A task exists.
+
+### When
+
+The user chooses to delete it.
+
+### Then
+
+* The frontend must call `DELETE /api/tasks/:id`.
+* After successful deletion, the task must disappear from the displayed list.
+* An API failure must not silently remove the task from the UI.
+
+---
+
+## AC-43 â€” Centralized API Communication
+
+Frontend components must not duplicate backend URLs throughout the codebase.
+
+API communication must be handled through a dedicated API module such as:
+
+```text
+src/api/tasksApi.ts
+```
+
+---
+
+## AC-44 â€” Type-Safe Task Contract
+
+The React application must define a TypeScript representation of a task containing:
+
+```text
+id
+title
+description
+status
+createdAt
+updatedAt
+```
+
+Supported task status values must be type-safe.
+
+---
+
+# Persistence and Configuration Acceptance Criteria
+
+## AC-45 â€” MongoDB Persistence
+
+Tasks created through the API must be persisted in MongoDB through Mongoose.
+
+Application restart must not remove successfully persisted tasks.
+
+---
+
+## AC-46 â€” Mongoose Timestamps
+
+Task documents must use Mongoose-managed timestamps.
+
+The application must expose:
+
+```text
+createdAt
+updatedAt
+```
+
+---
+
+## AC-47 â€” Environment-Based Database Configuration
+
+The MongoDB connection string must be obtained from environment configuration.
+
+It must not be hardcoded into application source code.
+
+Example development variable:
+
+```env
+MONGODB_URI=mongodb://localhost:27017/taskflow
+```
+
+---
+
+## AC-48 â€” Secrets Must Not Be Committed
+
+Files containing real secrets or environment-specific credentials must not be committed to Git.
+
+The project may provide:
+
+```text
+.env.example
+```
+
+with safe placeholder/example configuration.
+
+---
+
+# Engineering Acceptance Criteria
+
+## AC-49 â€” NestJS Responsibility Separation
+
+The backend should follow the normal flow:
+
+```text
+Request
+   â†“
+Controller
+   â†“
+DTO validation
+   â†“
+Service
+   â†“
+Mongoose Model
+   â†“
+MongoDB
+```
+
+Controllers should not directly contain database persistence logic.
+
+---
+
+## AC-50 â€” DTO Validation
+
+External create/update input must be represented by DTOs and validated using NestJS-compatible validation.
+
+The backend must not rely only on frontend validation.
+
+---
+
+## AC-51 â€” Global Validation
+
+NestJS must apply validation consistently to incoming requests.
+
+The validation configuration should:
+
+* transform input where appropriate
+* whitelist known properties
+* reject unsupported properties
+
+---
+
+## AC-52 â€” No Unnecessary Architecture
+
+The initial implementation must not introduce unnecessary infrastructure such as:
+
+* CQRS
+* event sourcing
+* microservices
+* Redis
+* message queues
+* repository abstraction solely for abstraction's sake
+
+unless the project requirements are explicitly changed.
+
+---
+
+## AC-53 â€” Backend Build Verification
+
+After backend implementation changes:
+
+```bash
+npm run build
+```
+
+must complete successfully.
+
+---
+
+## AC-54 â€” Backend Automated Tests
+
+Relevant automated tests must pass:
+
+```bash
+npm test
+```
+
+An agent must not claim tests passed unless it actually executed the test command.
+
+---
+
+## AC-55 â€” Frontend Build Verification
+
+After frontend implementation changes:
+
+```bash
+npm run build
+```
+
+must complete successfully.
+
+---
+
+## AC-56 â€” No Unrelated Agent Changes
+
+An agent assigned to a specific project area must not unnecessarily modify unrelated areas.
+
+Examples:
+
+Backend Agent:
+
+```text
+backend/**
+```
+
+should not modify frontend implementation without explicit authorization.
+
+Frontend Agent:
+
+```text
+frontend/**
+```
+
+should not modify backend behavior to solve a frontend problem.
+
+---
+
+## AC-57 â€” API Contract Must Not Be Changed Silently
+
+If implementation conflicts with the agreed API contract, an agent must report the conflict.
+
+The agent must not silently alter:
+
+* endpoint paths
+* status values
+* request structures
+* response structures
+* expected status codes
+
+simply because another implementation seems easier.
+
+---
+
+## AC-58 â€” Human Review Before Merge
+
+Agent-generated implementation must be reviewed before it is merged into the primary branch.
+
+Successful compilation or passing tests alone are not sufficient approval.
+
+Human review should consider:
+
+* correctness
+* maintainability
+* security
+* data integrity
+* architecture
+* unnecessary changes
+* quality of tests
+
+---
+
+# Definition of Done
+
+A TaskFlow feature is considered complete only when all applicable conditions below are satisfied:
+
+1. The relevant functional requirement is implemented.
+2. Applicable acceptance criteria pass.
+3. API behavior follows the agreed contract.
+4. Backend input validation is present where required.
+5. Relevant build commands succeed.
+6. Relevant automated tests succeed.
+7. No unrelated files were modified.
+8. No secrets were introduced.
+9. Agent-generated code has been reviewed.
+10. Known assumptions and limitations have been reported.
+11. Review findings classified as blocking have been resolved.
+12. A human engineer approves the change before merge.
+
+# TaskFlow API Contract
+
+## 1. Purpose
+
+This document defines the public REST API contract between the TaskFlow backend, frontend, automated tests, and AI development agents.
+
+It is the source of truth for API behavior.
+
+All agents working on API-related functionality must read this document before implementation.
+
+Agents must not silently change this contract.
+
+If an implementation requirement conflicts with this contract, the conflict must be reported for human review.
+
+---
+
+# 2. Base API
+
+Development backend URL:
+
+```text
+http://localhost:3000
+```
+
+All TaskFlow task endpoints use the following base path:
+
+```text
+/api/tasks
+```
+
+Example:
+
+```http
+GET http://localhost:3000/api/tasks
+```
+
+The frontend must not hardcode this complete URL throughout multiple components.
+
+The API base URL must be managed through centralized configuration.
+
+---
+
+# 3. Content Type
+
+Requests containing JSON must use:
+
+```http
+Content-Type: application/json
+```
+
+Successful API responses containing data must use JSON.
+
+---
+
+# 4. Task Resource
+
+The public Task resource has the following structure:
+
+```json
+{
+  "id": "68abc1234567890123456789",
+  "title": "Learn Codex orchestration",
+  "description": "Practice parallel agent development",
+  "status": "InProgress",
+  "createdAt": "2026-08-24T02:30:00.000Z",
+  "updatedAt": "2026-08-24T03:10:00.000Z"
+}
+```
+
+## Fields
+
+### id
+
+Type:
+
+```text
+string
+```
+
+Description:
+
+Public identifier for the task.
+
+The backend uses MongoDB ObjectIds internally but exposes the identifier as:
+
+```text
+id
+```
+
+The public API must not expose MongoDB `_id` as the API identifier.
+
+---
+
+### title
+
+Type:
+
+```text
+string
+```
+
+Required when creating a task.
+
+Rules:
+
+```text
+minimum meaningful length: 1 character
+maximum length: 150 characters
+must not contain only whitespace
+```
+
+---
+
+### description
+
+Type:
+
+```text
+string
+```
+
+Optional.
+
+Maximum length:
+
+```text
+1000 characters
+```
+
+---
+
+### status
+
+Allowed values:
+
+```text
+Pending
+InProgress
+Completed
+```
+
+Default value when creating a task:
+
+```text
+Pending
+```
+
+---
+
+### createdAt
+
+Type:
+
+```text
+ISO 8601 datetime string
+```
+
+Generated by the backend.
+
+Example:
+
+```text
+2026-08-24T02:30:00.000Z
+```
+
+Clients must not provide this field when creating a task.
+
+---
+
+### updatedAt
+
+Type:
+
+```text
+ISO 8601 datetime string
+```
+
+Generated and maintained by the backend.
+
+Clients must not provide this field when creating or updating a task.
+
+---
+
+# 5. Create Task
+
+## Endpoint
+
+```http
+POST /api/tasks
+```
+
+## Purpose
+
+Create a new task.
+
+---
+
+## Request Body
+
+```json
+{
+  "title": "Learn agentic development",
+  "description": "Practice Codex workflows",
+  "status": "Pending"
+}
+```
+
+### Required fields
+
+```text
+title
+```
+
+### Optional fields
+
+```text
+description
+status
+```
+
+If `status` is omitted:
+
+```text
+Pending
+```
+
+must be used.
+
+---
+
+## Successful Response
+
+HTTP:
+
+```text
+201 Created
+```
+
+Body:
+
+```json
+{
+  "id": "68abc1234567890123456789",
+  "title": "Learn agentic development",
+  "description": "Practice Codex workflows",
+  "status": "Pending",
+  "createdAt": "2026-08-24T02:30:00.000Z",
+  "updatedAt": "2026-08-24T02:30:00.000Z"
+}
+```
+
+---
+
+## Validation Errors
+
+The following must produce:
+
+```text
+400 Bad Request
+```
+
+Examples:
+
+* missing title
+* empty title
+* whitespace-only title
+* title longer than 150 characters
+* description longer than 1000 characters
+* unsupported status
+* unsupported request properties
+
+---
+
+# 6. Retrieve All Tasks
+
+## Endpoint
+
+```http
+GET /api/tasks
+```
+
+## Successful Response
+
+HTTP:
+
+```text
+200 OK
+```
+
+Body:
+
+```json
+[
+  {
+    "id": "68abc1234567890123456789",
+    "title": "Learn Codex",
+    "description": "Practice agent orchestration",
+    "status": "Pending",
+    "createdAt": "2026-08-24T02:30:00.000Z",
+    "updatedAt": "2026-08-24T02:30:00.000Z"
+  },
+  {
+    "id": "68def1234567890123456789",
+    "title": "Build frontend",
+    "description": "Implement React task UI",
+    "status": "InProgress",
+    "createdAt": "2026-08-24T02:40:00.000Z",
+    "updatedAt": "2026-08-24T03:00:00.000Z"
+  }
+]
+```
+
+---
+
+## Empty Collection
+
+If no tasks exist:
+
+HTTP:
+
+```text
+200 OK
+```
+
+Body:
+
+```json
+[]
+```
+
+An empty collection must not return:
+
+```text
+404 Not Found
+```
+
+---
+
+# 7. Retrieve Task by ID
+
+## Endpoint
+
+```http
+GET /api/tasks/:id
+```
+
+Example:
+
+```http
+GET /api/tasks/68abc1234567890123456789
+```
+
+---
+
+## Successful Response
+
+HTTP:
+
+```text
+200 OK
+```
+
+Body:
+
+```json
+{
+  "id": "68abc1234567890123456789",
+  "title": "Learn Codex",
+  "description": "Practice agentic development",
+  "status": "Pending",
+  "createdAt": "2026-08-24T02:30:00.000Z",
+  "updatedAt": "2026-08-24T02:30:00.000Z"
+}
+```
+
+---
+
+## Invalid ObjectId
+
+Example:
+
+```http
+GET /api/tasks/not-a-valid-id
+```
+
+Response:
+
+```text
+400 Bad Request
+```
+
+---
+
+## Task Not Found
+
+If the supplied ID is syntactically valid but does not correspond to an existing task:
+
+```text
+404 Not Found
+```
+
+---
+
+# 8. Update Task
+
+## Endpoint
+
+```http
+PATCH /api/tasks/:id
+```
+
+PATCH is used because TaskFlow supports partial updates.
+
+Clients do not need to send the complete Task object.
+
+---
+
+## Supported Update Fields
+
+The following fields may be updated:
+
+```text
+title
+description
+status
+```
+
+The following fields must not be client-controlled:
+
+```text
+id
+createdAt
+updatedAt
+_id
+```
+
+---
+
+## Example â€” Update Title
+
+Request:
+
+```http
+PATCH /api/tasks/68abc1234567890123456789
+```
+
+Body:
+
+```json
+{
+  "title": "Updated task title"
+}
+```
+
+Successful response:
+
+```text
+200 OK
+```
+
+Body:
+
+```json
+{
+  "id": "68abc1234567890123456789",
+  "title": "Updated task title",
+  "description": "Practice agentic development",
+  "status": "Pending",
+  "createdAt": "2026-08-24T02:30:00.000Z",
+  "updatedAt": "2026-08-24T04:00:00.000Z"
+}
+```
+
+---
+
+## Example â€” Update Status
+
+Request:
+
+```json
+{
+  "status": "Completed"
+}
+```
+
+Successful response:
+
+```text
+200 OK
+```
+
+The returned Task must contain:
+
+```json
+{
+  "status": "Completed"
+}
+```
+
+---
+
+## Example â€” Update Multiple Fields
+
+```json
+{
+  "title": "Complete Codex exercise",
+  "description": "Finish orchestration practice",
+  "status": "InProgress"
+}
+```
+
+---
+
+## Invalid Input
+
+Invalid update data must return:
+
+```text
+400 Bad Request
+```
+
+Examples:
+
+```json
+{
+  "title": ""
+}
+```
+
+```json
+{
+  "title": "   "
+}
+```
+
+```json
+{
+  "status": "Finished"
+}
+```
+
+---
+
+## Invalid ObjectId
+
+```http
+PATCH /api/tasks/not-a-valid-id
+```
+
+Response:
+
+```text
+400 Bad Request
+```
+
+---
+
+## Task Not Found
+
+If the supplied ObjectId is valid but no task exists:
+
+```text
+404 Not Found
+```
+
+---
+
+# 9. Delete Task
+
+## Endpoint
+
+```http
+DELETE /api/tasks/:id
+```
+
+Example:
+
+```http
+DELETE /api/tasks/68abc1234567890123456789
+```
+
+---
+
+## Successful Response
+
+```text
+204 No Content
+```
+
+The response body must be empty.
+
+After deletion:
+
+```http
+GET /api/tasks/:id
+```
+
+must return:
+
+```text
+404 Not Found
+```
+
+The deleted task must also no longer appear in:
+
+```http
+GET /api/tasks
+```
+
+---
+
+## Invalid ObjectId
+
+```http
+DELETE /api/tasks/not-a-valid-id
+```
+
+Response:
+
+```text
+400 Bad Request
+```
+
+---
+
+## Task Not Found
+
+If the ID is valid but the task does not exist:
+
+```text
+404 Not Found
+```
+
+---
+
+# 10. Error Response Contract
+
+TaskFlow should use a consistent error structure.
+
+NestJS may provide additional standard fields, but the API must expose at least useful HTTP status and message information.
+
+Example validation response:
+
+```json
+{
+  "statusCode": 400,
+  "message": [
+    "title should not be empty"
+  ],
+  "error": "Bad Request"
+}
+```
+
+Example not-found response:
+
+```json
+{
+  "statusCode": 404,
+  "message": "Task not found",
+  "error": "Not Found"
+}
+```
+
+Clients must not receive:
+
+* stack traces
+* MongoDB connection strings
+* credentials
+* internal server paths
+* raw database implementation details
+
+---
+
+# 11. Unknown Request Properties
+
+The backend must reject unsupported input properties.
+
+Example:
+
+```json
+{
+  "title": "Test",
+  "status": "Pending",
+  "isAdmin": true
+}
+```
+
+Expected:
+
+```text
+400 Bad Request
+```
+
+NestJS validation should therefore use behavior equivalent to:
+
+```typescript
+new ValidationPipe({
+  whitelist: true,
+  forbidNonWhitelisted: true,
+  transform: true,
+})
+```
+
+The exact implementation may vary, but the external behavior must match this contract.
+
+---
+
+# 12. Public ID Mapping
+
+MongoDB documents internally use:
+
+```text
+_id
+```
+
+The public TaskFlow API uses:
+
+```text
+id
+```
+
+Example internal representation:
+
+```json
+{
+  "_id": "68abc1234567890123456789"
+}
+```
+
+Public representation:
+
+```json
+{
+  "id": "68abc1234567890123456789"
+}
+```
+
+The API must not require the React frontend to understand MongoDB-specific identifier behavior.
+
+---
+
+# 13. Task Status Contract
+
+The only supported values are:
+
+```text
+Pending
+InProgress
+Completed
+```
+
+These values are case-sensitive.
+
+Valid:
+
+```json
+{
+  "status": "InProgress"
+}
+```
+
+Invalid examples:
+
+```text
+inprogress
+IN_PROGRESS
+Started
+Finished
+Done
+Complete
+```
+
+Agents must not introduce additional task statuses without updating this contract and receiving human approval.
+
+---
+
+# 14. Backend Environment Contract
+
+The NestJS application must obtain the MongoDB connection from:
+
+```text
+MONGODB_URI
+```
+
+Example local development configuration:
+
+```env
+MONGODB_URI=mongodb://localhost:27017/taskflow
+```
+
+A safe example configuration may be committed as:
+
+```text
+.env.example
+```
+
+Real environment secrets must not be committed.
+
+---
+
+# 15. Frontend Environment Contract
+
+The React application should obtain the backend URL from a Vite environment variable.
+
+Recommended variable:
+
+```text
+VITE_API_BASE_URL
+```
+
+Example local configuration:
+
+```env
+VITE_API_BASE_URL=http://localhost:3000
+```
+
+The frontend API client may then construct:
+
+```text
+${VITE_API_BASE_URL}/api/tasks
+```
+
+The backend URL must not be duplicated across multiple React components.
+
+---
+
+# 16. Frontend Task Type
+
+The frontend TypeScript representation should correspond to the public API.
+
+Example:
+
+```typescript
+export type TaskStatus =
+  | 'Pending'
+  | 'InProgress'
+  | 'Completed';
+
+export interface Task {
+  id: string;
+  title: string;
+  description?: string;
+  status: TaskStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+```
+
+The frontend must use:
+
+```text
+id
+```
+
+not:
+
+```text
+_id
+```
+
+---
+
+# 17. Create Task Input
+
+The frontend/backend contract for creation is:
+
+```typescript
+export interface CreateTaskInput {
+  title: string;
+  description?: string;
+  status?: TaskStatus;
+}
+```
+
+The frontend must not submit:
+
+```text
+id
+createdAt
+updatedAt
+_id
+```
+
+---
+
+# 18. Update Task Input
+
+The update contract is:
+
+```typescript
+export interface UpdateTaskInput {
+  title?: string;
+  description?: string;
+  status?: TaskStatus;
+}
+```
+
+PATCH requests must support partial updates.
+
+---
+
+# 19. API Summary
+
+| Method | Endpoint         | Purpose            | Success |
+| ------ | ---------------- | ------------------ | ------- |
+| GET    | `/api/tasks`     | Retrieve all tasks | `200`   |
+| GET    | `/api/tasks/:id` | Retrieve one task  | `200`   |
+| POST   | `/api/tasks`     | Create task        | `201`   |
+| PATCH  | `/api/tasks/:id` | Update task        | `200`   |
+| DELETE | `/api/tasks/:id` | Delete task        | `204`   |
+
+Common errors:
+
+| Situation                      | Status |
+| ------------------------------ | -----: |
+| Invalid request                |  `400` |
+| Invalid ObjectId               |  `400` |
+| Task not found                 |  `404` |
+| Unexpected application failure |  `500` |
+
+---
+
+# 20. Contract Ownership
+
+This document is jointly consumed by:
+
+```text
+Backend Agent
+Frontend Agent
+Testing Agent
+Reviewer Agent
+Human Engineer
+```
+
+No implementation agent owns the API contract.
+
+Contract changes require explicit human approval.
+
+For example, Backend Agent must not decide:
+
+```text
+PATCH is inconvenient.
+I will change it to PUT.
+```
+
+Frontend Agent must not decide:
+
+```text
+I prefer "Done" instead of "Completed".
+```
+
+Testing Agent must not change expectations merely because production code behaves differently.
+
+The agreed contract remains the source of truth.
+
+---
+
+# 21. Agent Conflict Rule
+
+If an agent discovers that implementing its assigned task would require changing this contract, it must:
+
+1. Stop changing the affected contract behavior.
+2. Report the conflict.
+3. Explain why the change appears necessary.
+4. Suggest a contract modification if appropriate.
+5. Wait for human approval before changing the contract.
+
+This prevents one parallel agent from silently breaking the work of other agents.
+
+---
+
+# 22. Definition of API Compatibility
+
+An implementation is API-compatible when:
+
+* endpoint paths match this document
+* HTTP methods match
+* request structures match
+* response structures match
+* status values match
+* validation behavior matches
+* expected HTTP status codes match
+* public identifiers use `id`
+* unsupported properties are rejected
+
+Passing compilation alone does not prove API compatibility.
+
+Automated tests and human review must verify the contract.
+
+# TaskFlow Architecture
+
+## 1. Purpose
+
+This document defines the approved application architecture for TaskFlow.
+
+Implementation agents must follow this architecture unless an architecture
+change has explicitly been approved.
+
+TaskFlow intentionally uses a simple architecture because the primary
+learning objective is agentic software development and orchestration.
+
+---
+
+## 2. Technology Stack
+
+### Backend
+
+- NestJS
+- TypeScript
+- Mongoose
+- MongoDB
+- class-validator
+- class-transformer
+- @nestjs/config
+
+### Frontend
+
+- React
+- TypeScript
+- Vite
+
+### Testing
+
+- Jest
+- NestJS testing utilities
+
+---
+
+## 3. System Architecture
+
+TaskFlow uses a client-server architecture.
+
+Flow:
+
+React Application
+â†’ REST API
+â†’ NestJS
+â†’ Mongoose
+â†’ MongoDB
+
+The frontend communicates with the backend using JSON over HTTP.
+
+The frontend must not communicate directly with MongoDB.
+
+---
+
+## 4. Backend Architecture
+
+Backend request flow:
+
+HTTP Request
+â†’ NestJS Controller
+â†’ DTO Validation
+â†’ Service
+â†’ Mongoose Model
+â†’ MongoDB
+
+### Controller
+
+Controllers are responsible for:
+
+- defining routes
+- reading request parameters
+- accepting validated DTOs
+- returning HTTP responses
+- delegating application behavior to services
+
+Controllers must remain thin.
+
+Controllers should not contain direct MongoDB persistence logic.
+
+### DTO
+
+DTOs define and validate external input.
+
+Create and update operations must use DTO validation.
+
+All external input must be considered untrusted.
+
+### Service
+
+Services contain task application behavior.
+
+The TasksService is responsible for:
+
+- creating tasks
+- retrieving tasks
+- updating tasks
+- deleting tasks
+- handling task-not-found behavior
+
+### Mongoose
+
+Mongoose provides MongoDB persistence.
+
+Task persistence is represented using an explicit Mongoose schema.
+
+Mongoose timestamps should provide:
+
+- createdAt
+- updatedAt
+
+The public API must expose `id`, not MongoDB `_id`.
+
+---
+
+## 5. Repository Pattern
+
+TaskFlow does not use a custom Repository layer in the initial architecture.
+
+Approved flow:
+
+Controller
+â†’ Service
+â†’ Mongoose Model
+
+A repository abstraction should not be introduced unless a demonstrated
+requirement justifies it and the architecture change receives approval.
+
+---
+
+## 6. Backend Module Structure
+
+Target structure:
+
+src/
+â”œâ”€â”€ config/
+â”œâ”€â”€ tasks/
+â”‚   â”œâ”€â”€ dto/
+â”‚   â”‚   â”œâ”€â”€ create-task.dto.ts
+â”‚   â”‚   â””â”€â”€ update-task.dto.ts
+â”‚   â”œâ”€â”€ schemas/
+â”‚   â”‚   â””â”€â”€ task.schema.ts
+â”‚   â”œâ”€â”€ task-status.enum.ts
+â”‚   â”œâ”€â”€ tasks.controller.ts
+â”‚   â”œâ”€â”€ tasks.service.ts
+â”‚   â””â”€â”€ tasks.module.ts
+â”œâ”€â”€ app.module.ts
+â””â”€â”€ main.ts
+
+Agents may make small structural adjustments when justified, but must
+preserve the approved responsibilities and boundaries.
+
+---
+
+## 7. Configuration
+
+Application configuration must come from environment variables.
+
+MongoDB configuration:
+
+MONGODB_URI
+
+Example:
+
+MONGODB_URI=mongodb://localhost:27017/taskflow
+
+Real secrets must not be committed.
+
+A safe `.env.example` may be committed.
+
+---
+
+## 8. Validation
+
+NestJS must apply global request validation.
+
+Required behavior:
+
+- whitelist supported input properties
+- reject unknown properties
+- transform request input where appropriate
+- reject invalid task status values
+- reject invalid title/description values
+
+Frontend validation may improve user experience but must never replace
+backend validation.
+
+---
+
+## 9. Frontend Architecture
+
+Frontend flow:
+
+React Components
+â†’ Task API Client
+â†’ REST API
+
+Target structure:
+
+src/
+â”œâ”€â”€ api/
+â”‚   â””â”€â”€ tasksApi.ts
+â”œâ”€â”€ components/
+â”‚   â”œâ”€â”€ TaskForm.tsx
+â”‚   â”œâ”€â”€ TaskList.tsx
+â”‚   â””â”€â”€ TaskCard.tsx
+â”œâ”€â”€ types/
+â”‚   â””â”€â”€ task.ts
+â”œâ”€â”€ App.tsx
+â””â”€â”€ main.tsx
+
+---
+
+## 10. API Client
+
+Backend API communication should be centralized.
+
+React components must not duplicate backend endpoint configuration.
+
+The API client should be responsible for operations such as:
+
+- getTasks
+- getTask
+- createTask
+- updateTask
+- deleteTask
+
+The backend base URL should come from:
+
+VITE_API_BASE_URL
+
+---
+
+## 11. Frontend State
+
+The initial application should use standard React state.
+
+A global state-management library is not required.
+
+Libraries such as Redux or Zustand should only be introduced if application
+complexity later demonstrates a real need.
+
+---
+
+## 12. Public API Contract
+
+The public API is defined by:
+
+docs/api-contract.md
+
+That document is the source of truth for:
+
+- endpoints
+- HTTP methods
+- request structures
+- response structures
+- task statuses
+- HTTP status codes
+
+Agents must not silently modify the API contract.
+
+---
+
+## 13. Architectural Constraints
+
+The initial TaskFlow architecture does not include:
+
+- microservices
+- CQRS
+- event sourcing
+- message queues
+- Redis
+- repository abstraction
+- unit-of-work abstraction
+- GraphQL
+- WebSockets
+- Redux
+- complex domain-driven-design layers
+
+Agents must not introduce these technologies simply as architectural
+"improvements."
+
+---
+
+## 14. Architecture Change Process
+
+If an agent believes an architectural change is required, it must:
+
+1. Identify the current architectural limitation.
+2. Explain why the requirement cannot reasonably be implemented within the
+   approved architecture.
+3. Propose the smallest appropriate architecture change.
+4. Describe its consequences.
+5. Wait for human approval.
+
+Implementation agents must not independently redefine the architecture.
+
+---
+
+## 15. Agent Ownership Boundaries
+
+Backend implementation agents normally own:
+
+backend/**
+
+Frontend implementation agents normally own:
+
+frontend/**
+
+Shared documentation such as:
+
+docs/api-contract.md
+docs/architecture.md
+
+is governed by the human orchestrator unless an agent is explicitly assigned
+a documentation task.
+
+---
+
+## 16. Verification
+
+Backend changes should normally be verified using:
+
+npm run build
+npm test
+
+Frontend changes should normally be verified using:
+
+npm run build
+
+Additional testing commands may be introduced later.
+
+An agent must not claim verification succeeded unless the relevant command
+was actually executed successfully.
+
+---
+
+## 17. Architectural Principle
+
+Prefer the simplest architecture that satisfies the current requirements.
+
+Architecture should solve demonstrated problems rather than anticipate every
+possible future requirement.
+# TASK-002 â€” Frontend Task UI
+
+## Goal
+
+Implement the React TaskFlow UI against the documented REST API.
+
+## Owner
+
+Frontend Agent
+
+## Scope
+
+May modify:
+
+```text
+frontend/taskflow-web/**
+```
+
+Must not modify:
+
+```text
+backend/**
+docs/**
+AGENTS.md
+```
+
+## Important Dependency Rule
+
+The frontend must implement against:
+
+```text
+docs/api-contract.md
+```
+
+It must not depend on reading unfinished backend implementation details.
+
+## Required Functionality
+
+Implement:
+
+* display all tasks
+* create task
+* edit task
+* update task status
+* delete task
+* loading state
+* API error state
+* empty state
+
+## Target Structure
+
+Recommended:
+
+```text
+src/
+â”œâ”€â”€ api/
+â”‚   â””â”€â”€ tasksApi.ts
+â”œâ”€â”€ components/
+â”‚   â”œâ”€â”€ TaskForm.tsx
+â”‚   â”œâ”€â”€ TaskList.tsx
+â”‚   â””â”€â”€ TaskCard.tsx
+â”œâ”€â”€ types/
+â”‚   â””â”€â”€ task.ts
+â”œâ”€â”€ App.tsx
+â””â”€â”€ main.tsx
+```
+
+Small justified adjustments are allowed.
+
+## API Rules
+
+Use:
+
+```text
+VITE_API_BASE_URL
+```
+
+for backend configuration.
+
+Do not duplicate full backend URLs in components.
+
+Public task identifiers use:
+
+```text
+id
+```
+
+not:
+
+```text
+_id
+```
+
+## Task Status
+
+Exactly:
+
+```text
+Pending
+InProgress
+Completed
+```
+
+## Type Safety
+
+Define reusable TypeScript types for:
+
+* Task
+* TaskStatus
+* CreateTaskInput
+* UpdateTaskInput
+
+## UI Requirements
+
+The user should be able to:
+
+* see existing tasks
+* add a task
+* edit a task
+* change task status
+* delete a task
+
+The UI must provide:
+
+* loading feedback
+* error feedback
+* empty-list feedback
+
+## Out of Scope
+
+Do not add:
+
+* Redux
+* Zustand
+* React Query
+* authentication
+* routing libraries
+* UI frameworks unless already present and necessary
+
+Keep the UI simple.
+
+## Verification
+
+Run:
+
+```bash
+npm run build
+```
+
+If frontend tests already exist and are relevant, run them as well.
+
+## Completion Report
+
+Report:
+
+* files changed
+* implementation summary
+* dependencies changed
+* build result
+* assumptions
+* unresolved issues
+* scope confirmation
+
+
+exec
+"C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'rg --files frontend/taskflow-web; git status --short; Get-Content -Raw frontend/taskflow-web/package.json; Get-ChildItem -Path frontend/taskflow-web/src -Recurse -File | ForEach-Object { "`n### $($_.FullName)"; Get-Content -Raw -LiteralPath $_.FullName }' in D:\Projects\AI_AGENTIC_DEV_PROJECT\TaskFlow-agent-frontend
+ succeeded in 162ms:
+frontend/taskflow-web\vite.config.ts
+frontend/taskflow-web\tsconfig.node.json
+frontend/taskflow-web\tsconfig.json
+frontend/taskflow-web\tsconfig.app.json
+frontend/taskflow-web\src\types\task.ts
+frontend/taskflow-web\src\main.tsx
+frontend/taskflow-web\src\index.css
+frontend/taskflow-web\src\components\TaskList.tsx
+frontend/taskflow-web\src\components\TaskForm.tsx
+frontend/taskflow-web\src\components\TaskCard.tsx
+frontend/taskflow-web\src\assets\vite.svg
+frontend/taskflow-web\src\assets\react.svg
+frontend/taskflow-web\src\assets\hero.png
+frontend/taskflow-web\src\App.tsx
+frontend/taskflow-web\src\App.css
+frontend/taskflow-web\src\api\tasksApi.ts
+frontend/taskflow-web\README.md
+frontend/taskflow-web\public\icons.svg
+frontend/taskflow-web\public\favicon.svg
+frontend/taskflow-web\package.json
+frontend/taskflow-web\package-lock.json
+frontend/taskflow-web\index.html
+frontend/taskflow-web\eslint.config.js
+{
+  "name": "taskflow-web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.4",
+    "eslint": "^10.8.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "globals": "^17.7.0",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.65.0",
+    "vite": "^8.2.0"
+  }
+}
+
+
+### D:\Projects\AI_AGENTIC_DEV_PROJECT\TaskFlow-agent-frontend\frontend\taskflow-web\src\App.css
+#root { min-height: 100vh; }
+.app-shell { width: min(820px, calc(100% - 32px)); margin: 0 auto; padding: 64px 0 80px; }
+.app-header { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 36px; }
+.brand-mark { display: grid; place-items: center; flex: 0 0 52px; height: 52px; border-radius: 16px; color: white; background: #28634f; font-weight: 800; font-size: 24px; box-shadow: 0 10px 24px rgba(40,99,79,.2); }
+.eyebrow { margin: 0 0 5px; color: #39735f; font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+h1, h2, h3, p { margin-top: 0; }
+h1 { margin-bottom: 8px; font-size: clamp(32px, 6vw, 48px); line-height: 1.05; letter-spacing: -.04em; }
+h2 { margin: 0; font-size: 23px; letter-spacing: -.02em; }
+h3 { margin-bottom: 7px; font-size: 18px; }
+.subtitle { margin-bottom: 0; color: #65716c; line-height: 1.6; }
+.panel { background: rgba(255,255,255,.88); border: 1px solid #dde3dc; border-radius: 18px; box-shadow: 0 8px 28px rgba(28,48,40,.06); }
+.task-form { padding: 26px; margin-bottom: 20px; }
+.section-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+label { display: grid; gap: 7px; color: #3d4945; font-size: 13px; font-weight: 700; }
+input, textarea, select { width: 100%; color: #17201d; background: #fff; border: 1px solid #cfd8d1; border-radius: 10px; padding: 11px 12px; outline: none; transition: border-color .2s, box-shadow .2s; }
+input:focus, textarea:focus, select:focus { border-color: #39735f; box-shadow: 0 0 0 3px rgba(57,115,95,.12); }
+textarea { resize: vertical; }
+.task-form > label { margin-bottom: 16px; }
+.optional { color: #87908c; font-weight: 500; }
+.form-row { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 16px; }
+.form-row label { max-width: 240px; }
+button { border: 0; }
+.primary-button { min-height: 42px; padding: 10px 18px; border-radius: 10px; color: white; background: #28634f; font-weight: 750; }
+.primary-button:hover:not(:disabled) { background: #1f503f; }
+.error-banner { display: flex; justify-content: space-between; gap: 16px; align-items: center; margin: 18px 0; padding: 13px 16px; border: 1px solid #e9b9b5; border-radius: 12px; color: #812b25; background: #fff1ef; }
+.error-banner button { color: inherit; background: transparent; font-size: 24px; line-height: 1; }
+.tasks-section { margin-top: 38px; }
+.list-heading { padding: 0 4px; }
+.task-count { padding: 6px 10px; border-radius: 999px; color: #53605b; background: #e6ebe5; font-size: 13px; font-weight: 700; }
+.task-list { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.task-card { padding: 20px; }
+.task-content, .task-meta, .card-actions { display: flex; align-items: center; }
+.task-content { align-items: flex-start; justify-content: space-between; gap: 24px; }
+.task-description { max-width: 570px; margin-bottom: 0; color: #65716c; line-height: 1.55; white-space: pre-wrap; }
+.status-control { flex: 0 0 145px; }
+.status { font-size: 13px; font-weight: 750; }
+.status-pending { color: #765a18; background: #fff8df; border-color: #eedb9f; }
+.status-inprogress { color: #195682; background: #eaf5ff; border-color: #b9daf0; }
+.status-completed { color: #24644e; background: #e9f7f0; border-color: #b9dfd0; }
+.task-meta { justify-content: space-between; gap: 16px; padding-top: 16px; margin-top: 18px; border-top: 1px solid #edf0ec; color: #89928e; font-size: 12px; }
+.card-actions { gap: 8px; }
+.text-button, .danger-button { padding: 7px 10px; border-radius: 8px; background: transparent; font-weight: 700; }
+.text-button { color: #28634f; }
+.danger-button { color: #a13e36; }
+.text-button:hover:not(:disabled) { background: #edf5f1; }
+.danger-button:hover:not(:disabled) { background: #fff0ee; }
+.edit-form { display: grid; gap: 14px; }
+.field-error { margin: 10px 0 0; color: #a13e36; font-size: 13px; font-weight: 650; }
+.loading-state, .load-error, .empty-state { display: grid; place-items: center; gap: 12px; padding: 48px 24px; color: #65716c; text-align: center; }
+.loading-state { display: flex; justify-content: center; }
+.spinner { width: 18px; height: 18px; border: 2px solid #cbd7d0; border-top-color: #28634f; border-radius: 50%; animation: spin .7s linear infinite; }
+.empty-state span { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; color: #28634f; background: #e3f0e9; font-weight: 800; }
+.empty-state h3, .empty-state p, .load-error p { margin-bottom: 0; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (max-width: 600px) {
+  .app-shell { width: min(100% - 22px, 820px); padding: 36px 0 52px; }
+  .app-header { gap: 14px; }
+  .brand-mark { flex-basis: 44px; height: 44px; border-radius: 13px; }
+  .task-form, .task-card { padding: 18px; }
+  .form-row { grid-template-columns: 1fr; }
+  .form-row label { max-width: none; }
+  .task-content { display: grid; gap: 16px; }
+  .status-control { width: 100%; }
+  .task-meta { align-items: flex-end; }
+}
+
+
+### D:\Projects\AI_AGENTIC_DEV_PROJECT\TaskFlow-agent-frontend\frontend\taskflow-web\src\App.tsx
+import { useCallback, useEffect, useState } from 'react'
+import * as tasksApi from './api/tasksApi'
+import { TaskForm } from './components/TaskForm'
+import { TaskList } from './components/TaskList'
+import type { CreateTaskInput, Task, UpdateTaskInput } from './types/task'
+import './App.css'
+
+const readableError = (error: unknown) => error instanceof Error ? error.message : 'Something went wrong. Please try again.'
+
+function App() {
+  const [tasks, setTasks] = useState<Task[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [isCreating, setIsCreating] = useState(false)
+  const [busyTaskId, setBusyTaskId] = useState<string | null>(null)
+  const [error, setError] = useState('')
+
+  const loadTasks = useCallback(async () => {
+    setIsLoading(true)
+    setError('')
+    try { setTasks(await tasksApi.getTasks()) }
+    catch (loadError) { setError(readableError(loadError)) }
+    finally { setIsLoading(false) }
+  }, [])
+
+  useEffect(() => {
+    let isCurrent = true
+
+    void tasksApi.getTasks()
+      .then((loadedTasks) => {
+        if (isCurrent) setTasks(loadedTasks)
+      })
+      .catch((loadError: unknown) => {
+        if (isCurrent) setError(readableError(loadError))
+      })
+      .finally(() => {
+        if (isCurrent) setIsLoading(false)
+      })
+
+    return () => { isCurrent = false }
+  }, [])
+
+  async function handleCreate(input: CreateTaskInput) {
+    setIsCreating(true)
+    setError('')
+    try {
+      const createdTask = await tasksApi.createTask(input)
+      setTasks((current) => [createdTask, ...current])
+      return true
+    } catch (createError) {
+      setError(readableError(createError))
+      return false
+    } finally { setIsCreating(false) }
+  }
+
+  async function handleUpdate(id: string, input: UpdateTaskInput) {
+    setBusyTaskId(id)
+    setError('')
+    try {
+      const updatedTask = await tasksApi.updateTask(id, input)
+      setTasks((current) => current.map((task) => task.id === id ? updatedTask : task))
+      return true
+    } catch (updateError) {
+      setError(readableError(updateError))
+      return false
+    } finally { setBusyTaskId(null) }
+  }
+
+  async function handleDelete(id: string) {
+    setBusyTaskId(id)
+    setError('')
+    try {
+      await tasksApi.deleteTask(id)
+      setTasks((current) => current.filter((task) => task.id !== id))
+    } catch (deleteError) { setError(readableError(deleteError)) }
+    finally { setBusyTaskId(null) }
+  }
+
+  return (
+    <main className="app-shell">
+      <header className="app-header"><div className="brand-mark" aria-hidden="true">T</div><div><p className="eyebrow">TaskFlow</p><h1>Make progress visible.</h1><p className="subtitle">A simple place to capture work, move it forward, and finish well.</p></div></header>
+      <TaskForm isSubmitting={isCreating} onSubmit={handleCreate} />
+      {error && <div className="error-banner" role="alert"><span>{error}</span><button type="button" onClick={() => setError('')} aria-label="Dismiss error">Ã—</button></div>}
+      <section className="tasks-section" aria-labelledby="tasks-heading">
+        <div className="section-heading list-heading"><div><p className="eyebrow">Your work</p><h2 id="tasks-heading">Tasks</h2></div>{!isLoading && <span className="task-count">{tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}</span>}</div>
+        {isLoading ? <div className="loading-state panel" role="status"><span className="spinner" aria-hidden="true" />Loading tasksâ€¦</div>
+          : error && tasks.length === 0 ? <div className="load-error panel"><p>We couldnâ€™t load your tasks.</p><button className="primary-button" type="button" onClick={() => void loadTasks()}>Try again</button></div>
+          : <TaskList tasks={tasks} busyTaskId={busyTaskId} onUpdate={handleUpdate} onDelete={handleDelete} />}
+      </section>
+    </main>
+  )
+}
+
+export default App
+
+
+### D:\Projects\AI_AGENTIC_DEV_PROJECT\TaskFlow-agent-frontend\frontend\taskflow-web\src\index.css
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #17201d;
+  background: #f3f5ef;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; min-height: 100vh; }
+button, input, textarea, select { font: inherit; }
+button, select { cursor: pointer; }
+button:disabled, input:disabled, textarea:disabled, select:disabled { cursor: not-allowed; opacity: .65; }
+
+
+### D:\Projects\AI_AGENTIC_DEV_PROJECT\TaskFlow-agent-frontend\frontend\taskflow-web\src\main.tsx
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import App from './App.tsx'
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
+
+
+### D:\Projects\AI_AGENTIC_DEV_PROJECT\TaskFlow-agent-frontend\frontend\taskflow-web\src\api\tasksApi.ts
+import type { CreateTaskInput, Task, UpdateTaskInput } from '../types/task'
+
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000').replace(/\/$/, '')
+const tasksUrl = `${apiBaseUrl}/api/tasks`
+
+interface ApiErrorBody {
+  message?: string | string[]
+}
+
+async function getErrorMessage(response: Response): Promise<string> {
+  const fallback = `Request failed (${response.status})`
+
+  try {
+    const body = (await response.json()) as ApiErrorBody
+    return Array.isArray(body.message) ? body.message.join('. ') : body.message || fallback
+  } catch {
+    return fallback
+  }
+}
+
+async function request<T>(url: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(url, init)
+  if (!response.ok) throw new Error(await getErrorMessage(response))
+  if (response.status === 204) return undefined as T
+  return (await response.json()) as T
+}
+
+export const getTasks = () => request<Task[]>(tasksUrl)
+export const getTask = (id: string) => request<Task>(`${tasksUrl}/${encodeURIComponent(id)}`)
+
+export function createTask(input: CreateTaskInput) {
+  return request<Task>(tasksUrl, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input),
+  })
+}
+
+export function updateTask(id: string, input: UpdateTaskInput) {
+  return request<Task>(`${tasksUrl}/${encodeURIComponent(id)}`, {
+    method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input),
+  })
+}
+
+export function deleteTask(id: string) {
+  return request<void>(`${tasksUrl}/${encodeURIComponent(id)}`, { method: 'DELETE' })
+}
+
+
+### D:\Projects\AI_AGENTIC_DEV_PROJECT\TaskFlow-agent-frontend\frontend\taskflow-web\src\assets\hero.png
+‰PNG
+
+   IHDR  W  i   Ÿ›÷  úPLTE   éèì~v†~v†pdu­¨±ÙÖÝæäëdZl—¢}uƒŽ‡•~v…½¹ÁâÝê†ÉÆÍ~v…†“w†\Í€x‡ÔÎÚ~w…º¶¾»¶ÀÈÆÌQº}v„~v†´°¸VÅ~v…‰•x‡ŽFæÜÖä…R»¿¡âTNZ…~ŒÑÂäg^p|u„OHU€x‡IYQ^•›¦¡«·å|v…Ë±è}v…Zµ|ï€x‡xC±Ÿ™¤€xˆ—aÔ°é\-gâªmë|ÄŠƒ‘f4›}u…BLEQœ—¢q5¼a½hài×HÇŸcâ§kêV(“XÒr!Ü¯oõ}.åm7°ŽMåOªž_æ£tÛ´}ñ–[Ôo3¸©‹ÇqéVÃY%©oãQžQ±s0ÒfáŒ…’E–@9FXÀJ‡h,Ã¤häpEŸ„H¿:	‡BšO²Š<å=‡œ_Ú‹5ò«rèŒOÈÂ†ùd\j~:Ég`mÃ‹õ8	ƒH½:	‡w‡4{ŒOÇ~F¶§mçŠPÂ>
+‘=
+Œ’TÏSÈ@„—[æ‰LÄ‡M¾‚I¸}v…QÌ4
+u¨mí±wñ™]Ðx>·{E±•YÎ“Wáw?±ˆKÜ˜[Õv@«;|q7µ gåœaå¤iÞ„BÛG—A–Nâ”UÓ0p}?Ô…JÂ~B½_×[(š˜_ß®tèv:»RÜ¡fë“YÉ¡eØd-¨j5¢DŽp<¥L“­rðŒIèŽTÃp9¬v1Úa-Ÿ½…ò^ì™ZÛS šU%K‰•Dì‘QæmäfÜL§eòC›?å bÞŒOÔ_ÔT­X"£ÃŒõ|>ÅcÑe4™’VÚk2°k5©J§ªoâ…Dâ„DÎDÆ”Ué…Nºtè:à]%®P£«kó¹}öv9Î„IÕF¡›Pî¶}ëL°,gG~‡JÉ_!¼¡[óg,ºÉ”÷±röŒMÌ¦cçp/Ï}+éh'Éu7Ã{ón1Ãi Ô°«µääæ¬0¡B   |tRNS ½p# ¥‘T°;Ã©ÃþÀ*`YJAþCßdþï¡¸ ¨S#·20À>Ÿ ˜|cŸAÊãß»‡ŒsþïŒ|uÉo^Y_]–„á´?ÞÙ¤?ÌÇ®œ„}dƒkecÛ¢8çÅÂ¬sãÜ×À¸á»ÞÀ¾åÝÐ¢ÀØøåÃ²}4  /:IDATxÚìÜ[®›0àa¸	!ŠDH‰À:m¬HTQ%”¾f_ÞknÝ›µ‡ Ä6þtV`EÿñŒg Ã0Ã0c±œS–Ù«óùr¾ØöŒ‘Âlõ¹äˆÉ6¸ßþ®u‚¬-ÓUvc'»”œÖnüÑ‚?­½ü –4ÁxøPSŽõÑƒ÷xÇ[–ñ Ç.i[ÐÍÚDXœÍöSÅÀƒ>Þ\äæd{ŸêÕƒ¾,¹mnÿE¼îàë
+“³ÝHŠÉ•WØ˜0xŸó…'{b­‰Ù÷ˆWã»XÚ`ü3Xë7î-21û·‰`'ÚÔ„ÁýÝª¥GÍ?"¿˜“ýíV²`“pMüB#¦²‰¨9ÙïÁJ“=Lé°5¥­(Z]˜˜(mW‹>Ù¬Ä`Óó¯KŽY’ÒjÏ±‰°Yæ“‚sáIÏ³O–³"X?ùðT.ãK+mIOa³¤˜=¥üCsØDøy)aà¬8îa.1[HÌÞJ`F¾‹…þ1K
+Zí`^^¥{Ì†)O0¿|ÛR}ÃÀ±[<Zð
+ÖQß‡š[‰×5¼Š¥i‘¤tt7p|iK@/a‚I¯vˆôºsýèJ`-†c´9Ù¬Áàäà×ºÄ,I1Ù€<6[,Ôï :þáõÁz/V~Ñ±K€t|•î ’†]=‘U©ûj{ú>Â"«|«fÑYqz™)³¢hµ@n–K‹¨„|ÆH–k—R£Þ?FXÔ+3#ŠV¹ƒõŽïª1ƒ(FXä¼[½Çÿ$ÿ‹0}ÕˆÒVæbxn•	Ö{±ÄÄïÝ@ÙïV1ÛÊ¹^G*iÑªr‘¤4ÉAm"få
+gÅ%xfoO¥zµ›Â>è@¦õ:RÐzºXWLŠ˜S&q7pˆMõúõ:gÅU*Zû±^¾Å|+i êµ‹åbsƒWÝ@•o¬]v[ö¢Ä0ÕãnÕ1ƒø@Ÿk¡ÝÀ!|—µ_B˜UVRÅºƒ|¢³†˜ÔçÆÚ%¯æë †—Vë`ýk½®;fZh“Š5K‘òÌÎÅÚ>{ïƒH=Âò/*tEÑªæ3Ëx{ÄgÅ¬œ³³yR‘ú­ýxOŽ	STþ™eŠ˜å“®×9v«{ÑÚõó]:,´ÉÅw§*m	cÕ²ƒõ^MQÚ†”.¨híçµ—pô÷Ã¥Xh“‹?r½.+T›œ‹¥E6¼¸•i¡M."fOƒÚTœK<ä]¢¨ãKëä1ûhÑZ›`ý??bÍ	z»µÌD@?1íÿ“=óÊ”W}ùQKèÁa<2Éú•½³Ùmˆ¢ðuâŸ8×ì8¨Xu©¡%²Å[Ä›D¼b3o0O2D@€ŽOœ´›.`Ó«éñ¹çÎÏAû‘¤°ïevMã«°R`TÖ­ÖÃp2Éj€ì]ÛXðxfuKz^«.8¿·&-c¹èT “Ž¨[®ðÕ‚4˜º6ÃžJSÿÕ¢ŽÓÁéQGV²¯5¯!u4a#ßkëÚ­×f¸J[WPG‚šõÚëb×&Ü,jêªº¡v|)ßéëÚ	A2U£¯Jv“‚ÃMe|•A—¾Šá©¯5uµóhE‡6_¿©šº’×E/bMCƒ”ö»%gd„çqÇxk°Xè¡¯«Š‰Œ-[u!,Œ[n‰È©ñYvõÃÝÆ,;cyõÓP@]éU§)›O¨ÂzÿjïœCÎÃ®óªc”.í¨Y¯3ÚaoYÖ‰;daLDÈzUñŸ§j®ë€ña8n¹{˜×F*Ú{‘ã“ôxJ;€ï–´ÿ:#.¼NþÅ˜{³_)Y×ì3òXÖ¾‹rŸ{ÃB›è ºÚô7“-³:™ý‘³?„××±ŠžßÉì/	àý‹ƒ­×}—wžkw
+†¹1íù,û±“Ìe·‡›l—=Öàö¯û$ó«÷\V9Oè1¸NÆJóçžóÞ5·¶~ rÍ@6bô8*Õµ!Ë®õr;cÚ#­±ÒÝ¿iÞ¹¤¡’Ù«ŒfoÜ*·Ò‘Ë[Òðå³CZüklmÓžðI÷ùÓ==ÎÇÏiíõg<»®Qx•¤g}ÑÖ•|V+5Þ5%ˆ¶Ç¶3ªc{7¬;³ÜñöZDÃeÈ©v‹÷©VXÈ]ˆÅUÈl2)bÁDDzÌûÁ‚'„T6ºx1˜Ì…k#eå¯‡Uåtß­O¦YD9Œ¶evÉ—ëÚ›Ò³	-+½Õ|·ª5ÉŠÐÀnöž^®älž`ÿQ¬‡´««n½þˆµ¸O˜\èEI•"¼ñx`Õ®×ƒŸ÷eD^Œ¿DÏ{Ìavßíú×‡KìªWabÀ.ì\½½a¶VR¡ÃÃo'çØ” á‹K’Ùt1÷±Œ{.ŠÛF·’)‹¯¬èb®„J~4­ öJT r¿çÂ>¬EèÀ,d±SÎÎJðŽKW(fÒ,ï5>kÿáRð»8
+Ûÿ²‘±©Ò@„d.÷ŸèBüëÃˆŸ0™íµ{žö¢V¾wS)Z×}ÆkŽÉ¬cY{/á÷ƒÒu vÅ]ÿ•[êôõíàwêñf’[› Æ+æÙX+$$3ÿ[¹e“÷¡En@2ëµQ·|PXUtK§c¸–ØÚŠ^Ú²X€Â‡âä¯×&³FµÊs½
+vy°]	«I ˜¾î0û2Å d­yBÂÞ0ï!¤\{Ýëò­©Í]Lmk[`«ïµãZnÇšÎ}4àŠnI[¹eÓºV9—
+11°xÄ*40aîÆ¤å¨«64àaUvuî›câM5Â
+®×û‡é–xk[žñ’¶Ëæ`!iàòÁ<ú}CQøÔò1íÍ“#Ó@<A”˜•r,q–¯uøÓÀÝ@à™¨DìRã›ðüZÛ™W®lLX£šÖÆþ|P3uÏ©µ5\6‡›ÖÅ`þdX(M‚x¶ÇëÒO	a4Öˆ°â>omæf)Îäx]Õ´Þ€Â
+6­x]qúŠ¯Ð©­÷òn6v«½ùnÌrL]±)Íñ2ûÒžËÙ0Ðœøs¾8Ô[™÷&’ákåM0ÏÅ_4AL‘‚ÃC¾¾¥—güMÝèÅZÛQPbiàÍOa=Ì¾ó‹Ñ–e3z~ì:‡O¹‚Ÿ2mî_ñAä©yBöü2káM+n›VÎÔ~ÕMŸC–èæþÌ|'ÃòøÙØÂø¬®¸ÌŠëÃò[[;ðÞ@u„°Þ£um2µ@™Ë=7ø¾ÛÂò$u5—Ç=6+yþÏÒÚ&=:Vq¤·,t$úq‚‡j€ÁùñÚtÒúÎ›þëÂ#„YV>ih`{åÒ{'ç’‡c­ó\¹ƒÉìÓ½ùilJTX‰¦Íy ü+’ `‚øT2›À{= iý+^×æ2[Àóð'ƒI NZc·hÔ´bûÞðºâôeäb9×¶ôb:%¶h#K¨wUU[³^w[½1õœ„§#gAz«L¯ë`pB­^KoŠÁÔwN5i,pxÈ×c:ƒS”om1õtÜâ$ã„QÆÜK£sI¿“w6½IDQ>å2|´ÎíÀ”¡Ó&¸€ lp â$U2:©A‹	±Ú)"ÂFMXËÊ­+ÿÿ…]»céO0Äw4jý`<Ì;-ò¬š’¶é»x8÷3ŒVÉ(½œpeú°¸…Ýdmà"ã\¨Á6ˆ!)˜6P/¤m`0ý«÷QAÞ^’Å·±ÂÂõ¾…Ï•_³÷<¯;ˆ9ìn`”­°|ëâçêmUôíuFtþTÙ•V9.ŒPw
+óçŠßÓäk_»4ˆœÐ•	U±w
+sÜwÙÓžæ›‘ËU[žèb»Ø6m±ÁÅåÎ‘YSÛAD~dÕš¼‚¿ÿyh­’[¦ùþ.ïYŸîR€ CZœ]9ø6 S•×IB~hšY8DÆšën¾a“¤Œ¼S…-ÎJš[ö™õs….U-¹kSp¨™ÓŽdYr¾o=ê•ÿ¡ÆƒZ9©†I×þPÕ3FèÜ'Täe[ùñ³×ÌÉ àxßž+SÀ‘Uƒ_`šÝA—SZ&®ª¡ucG’6åMY–¤òÚzè\ÁÈ(€%£}ådÌÃ‰ùp±s}hYL¬¿£užQŠjº,•ãq#iÄãå²¼Uœ¯àJ×)üJ~8meÍõâ?ÅÚ³ZÍ€2ÍnADÖvmí/ö>àÐ,bÃU$¥ÞÔ¬Ít§Jj ¶ÂbÏðÓ¬y6[Ynÿ²Nª¢732URŸý'ò-³±pÓ¬#VGîÉª²ÀdõïbuIvÒ)A ÄÂþˆuÚº„Ÿ@ÍFŒÔI±Î”Át/Dr«>ÌÙŽ#VE[MFA ;	¢z—mƒ˜X®¼bX×(`q4~#¯ïþ.V7ÍšÍ³ŸëÍï‡V4u’ÁO”BÚ¦€§6œt²‚s_äëQ#sÂŽ¶IÅ?±ÆÓöœ¿-êh8	ÛÓd
+7jàÅöíaë’#Ö¹¡Ã3Ü îýåÐŠ×lÚiV.8m ò/Æ­,œAš¦õ¢@4ˆHŠÉ´¯TÌ1bšx~ÍöÆf…SŒö.×j¡¯Ú\š¦×\ÉáÛ|x Ü(ÄeSÓ'ÅA·ïU³a–"Wm ?Î…ošÝ,8‡V~ò-Ös‰Èu5ÆÑòCmâa.ÂÄª/Ðƒãýo®ü~ÍöŽp³^³êœ{ÆÑ“m ?Ñ«Ûý¶¿ÆüœX­ãû€´G •TR_ÉÎwOµ›m[Ç.‡VÍV‘£g©æÀo*ƒíý,œÍÞ˜µbÐI¢ ÁH¦ÀR¥  zuƒ£Aäñk¶3ab‡V'jjGž%ª—	b+Q„Ó ¶}ókx5†¾Ìr‚PVX´$¡;ò––ûùÝÜÖ¦d¨)Bê:‘ä[ÛýG€…%‡x×Š‡*u›Ñèu5‘P«)5•b_b×õˆ§ÖÝÞ/áû,×WQb=nT 8h¤¨èõ¯èº®hQ
+zuûüS?rÅ
+ølÖ`Y ‡º7‚Øl{ð©{g©ž,Ÿ||VÁ4ûÇEX.V®¿ý°/4ÙÒóA–zëÕ³§Âæ×Ë6º÷a9¹tøòY›còÏ~µmöo/ÊS	?ü¸_Âžð©?zþnéÄú»Þ³d1Éá_-uº‡Ë(Ö/ìÝ¿kSQðëäV‚ oxƒ>¡K! •:h
+Qj•ÖÔD$†â/Ä©8íæ!"—"¸¼¸ôdPi#c‘G#·-Þ—B‡ÒåñÚ¸ˆ“•Ö“¼§ƒÒóù¾\¾9çÞ6ùÕ€Õ¼;09|bÍæÏ2ò£š†Ù_2™LZ»v‰gÊgæº<º3z’‘Ÿ5ûxöÖ™?ÿ‡¶´´öçpz™¹-wW±FÎ_9PKkN¦šÙ(–žëå|d„Šu_q³1Ý“ì®‰ÕLÒlõûD3{+Äy=3flÄù½™õüäÞ‰»n˜#T¬=j¹h°{+£@ÅÚÛÀ©Ä» ÓuÃ8¨÷VAÉ%³þ\4òtXûvn4í/Ö5k §
+C7úy¿j=¤Xn	ç£½»ÕÌS¬[Ìža¸hÖ ] ¨C¹õ1†›2ÒŒ58WÆ+öøf„F¦gî1ÌØ‡#Á–´aowè
+;”¬9‰Ýb¿Ý:ÊH—ZSØw]muþ¥_zýŒ·nboYÊ5œs-ìƒkøíåÊxóögØe³B±fÐóê,Ñ¶JvÍµÝ¹ÀHpGæŒQ¬æA¾4rh®¯ß[Œ5P6¿á¹Ö—S´q–ŠD<,×k¥Wízú#ÄFÐóZ*¾vb4Ão¶@Á}ì± íÖ^.×§)Ø âå€ïcçu²ëVç§;ÍHŸÎ–P
+š«ïºuGtë©	Fú1X(o øø÷±\bÛÙ†ÍjÊ:ÆHOWÍr‡Kåùà¥±~]Ür‡Ú6(o»šŠÓ»l§’æ¦-µíy ö#,×–éK«Í•í¸‰	úüBŽD¾ùZH%(Ùa÷niUKO	O—jÖFö7`åà¯pÊXAsm¶<·8¿Ò|àv-1Mï2ûšÈ|Ú®„Ojðìšëœ	Oª¥ÏJpƒT•WÏq*ƒ=N¦3K])uWƒ²W¢k»	,×YókÕuß<—œ+­”ºX‹ÑÌõ«£V¦£´-ø—¾Ô@®>I£¹n4¶Ý¡öGíqOr^‘¢²ò"fÑš°ËxaIki[€¼Ë+JJY|šCûuÆ„juþ¥”bÍ×Vì5±]KYTßÙ;—X¢8Œ³agÕØtaá‘ØXˆ©XI!^‰•HDb#™NêV[Âp8s\3c8L‡cÎ Í¹ÓzÜi¨Öå¶£žCŠ ^ÇcÝx¬ÜëŸ4Ó.šI~ùòïÎÌ9?kÊÂ‡‰ÁcÀû‚®‡øéƒÂR0>g­¸
+éV³?/›†Ž¾ýA'^èb/œ1õæúV#–,2êø)Öº÷^çê3¼ã©îAç}G®GR×#Oï›;+c€<õŒ  .9XçüŸ—[´çô==à`¹¯êF`pGà­A¾çK§õ­•¢p¤x>oBË Ø )„$`˜tßÔÙC|‰fòúç3›©!T0°çá§…À0Bÿ`Ð³¶ã¸•8mšruóSlpg%p°°P¨½’§N>lÈÖÄéëëŠìt¿òCáz€¸WrÀ\|Æ@(Ÿouæz]|V~Z­î4Á„»‡nx˜!T`¨Ö×#Ã9C5ÍŽŠ-ñüÕœß†žñé!˜¤PàãP6^Jtâ:éˆ(òÖ jn©{ž½BDÀ>¶ýSqG®7†dæ>yÉµÓ=&<“;ßE0À.áºó01¸ò°Ç²Ö˜tÇíÖ
+	1ZTfÄM†=z¡áà2j,ÌîÌ]È)õ9‹‡\k;%vËß\­ÊÊ™Üæ·5"@ðÀ Òqhè!&¡Ùó&šèøêÆÊ”J•?:p{€¹^„‚ P„Hˆ4ºž€ù¼³76eHÙì”%±×7Œjwþí™¹ŒÆ0±‡ÃâNà\tN$½¶ó6‡¿A[†NÍC¸€]L\Ì4h÷`¿»ïgN.ž0dÈŽ›Ü¥¶K_üùjÎ¹ãlµ‘íyQtyAˆ1öÏ‘Û@GÁ^O¥Ÿ5³²“b:qíjˆQÌè‹[¦UÍgô68½dhd®á“cŒRóÓƒ£;{äÐzµ_c„!¬» ¬„@'ØÀä<ÿŒËµs­Å»EcgÜÇ€Ëy5€Æ\æ»É£¾¢8=;Ø—OÔØ¢!ð˜Á”i§ëåR±ØÔ·fgÈ¦ÒïCŒ†.Aàñ+ÍÊ‘Ü];×¤éÔ˜/ÝÙx#dˆbj»5W•4ßõiïí~K±úóÇß*—
+ïölô´.xñz$Rl6ý}0'[œ½GYÈBàÀwJÔä-î¿ önVßBöM¨®}Np)½©˜0—?`4‹Åò—°+6˜3×ˆ™]·o
+×[¥r±Ùnôð4 Tœî“ª
+­ÕO÷™K¼€€lÏ‡å¿´ùÀºTÄØ·×(ði€˜F¹h¼j›{ÌÆQÓ¹OÚÍb$}Ô›>hÉN¿ãL:Jµ"åbñJÂ;°¡¼:M}€Äëcv}.·lŽcý%°«¢ínË( ¶m#íqõÚØàäQhõ+æÔþT*—£w¯?ÔbƒsqÂø.yÛî” )•¹ñü§ïìJRÊUf«Ô€aLCÉ5sý„²bC¶2µÀ¶©o« ôÚ’­"õÜ^Ó²Žé?hËåÈÝ” |<×5øÖÃÇÍžºùr"%$bkL©Ôl³-°jÝ1Íã‡hRU‘«Ê ÀÕX=éwN}ÙèÀô &Ù°{¤IôÐ«FÝ2åS¤]*s÷™ g™A¶P3ròø­—ÄÝ	áX"u$-•›íl·ï(õÍ{{¹P5MeHI€À=°ôwÏÕÜ·j6wU	iRòšªîÑTé´oYw*p7Ør)ÒŠ
+B:‘¾‰g¦Iƒ	]§rÛv{!r¹&Ž´¾Å¬ÂiÆåLæ4÷ ÉFÓ4ÎÆFê´ù¿¿ƒÞ²·*ÐT@$õÑ$ÿªÑä©W<À¸{¾X,•¢Ï„”˜Ò»VÌ$Ø”©Såm‰Ä.×ÝüólÌ˜b±ì7¥Q¹Ó×GUUMÚª­JuµÕcÿìl½E5.ús6'ûä¤½ÇÞ#ì{«T,Ó<úü›ÁŽ¹›úNVÜ}õR~ÎäA0€›Öe¾<öâX‚—(ŠÇ„V«Ü,¶Q¯MEiï³©´ç µ%¨Ò¼¹|Ÿ¹ó´Þ’¤ÖhRJžS÷Ð{G­VÞöx‚Dï¦ÓiáH"!ˆâÁ™Åÿº_Üe^Jp¨ÇŽ‰/8Ùt*}7òÍÀÜK©˜‡’*U5Õ¶9ôw»a.G9ÔCjòÜIÉ–öœì½ó±­ø[ÒŠ´xI§9X1½[¸Ù½hñ?ÝÚNß}áUAà—„RÏÊeÎU•Íz]©ÄoïW%ÛÖh/MÆæÿí!æ_©;³‚8ŽóÂ›§—>ôÁ‘xñ "‘8#Dqß„!ñ “5#ÄXuO³¬së[·¦èZt©`©³ÈjK#îãÅoý‰£¾ívÚ·é7“Ï|¿Ýv{4ÛÃÌÕµÆ†LæúõÔòÛ4X°–…tK'ºÎÂw¶ûû\]‡í»ëÚœ#ø.¶nS¤#ø‰$¤¬K+R¥L¦T:²cÿZóð¶íœ9?AÀ/`vãÁ¬ùvÇ5`àÜNß)§S×ž<Ö´¢fY!jÙ˜ÔÌÈ]º¿O×ÿ³zNÅÛU½Žl›#xb`RKjàë¶©ôƒ4[fv›a<ß¶è'®þ"‡Ž4¸PŠw®÷?^ÖŠÉÈ'Ù”À0‚ƒÈ½ëÆý§Zö™yeÛT· ¼®ÛÞéT_¡9prËÒÓÇ3™ô»×ó`Öø]ê9d­³-»Ã¼WÝ_Þ;×­/?Ö’QhJ|Ÿ#X¹Ô×%gw÷÷Ÿ`»ßÉ‰ØR +þW‚tŒˆÕ
+²N®xð U:Vzí<7g1¸úÕnñólÖ0êµ×åÍ©»k¶?yü¸¨…a€Ç0b^-ŠÓWúüO™«UŸÁ™†Â6Ç¨ûkÇ[&Ô¯iH¯[Ò‡î~¾³óhÕ1 ¬¿[íç8çn>wª¯ËÐƒ}píä—Ë—“IÝ'ÛB(Š“E­JÙèþ¿ôfÛöé³óÅî7œƒ•\ç6ä+ >×‰U«iÚã'WAIP.?ØqoÈŸù±{—!;î9Õë¥t&“ºõðcj5_p¼ub„}‹èf„Qò|‡ÿEší2âÒ	ÿá©À³”X”c›:GuHå8²¢¤ãu÷¾}ÇŽevßø3W­ÞÛ_*¥?—6ºú­ AïEÇùcà¼x¥1¤P¢¸go‡±MŸ¹ºöyò!À‰ƒ‡j¶‡ðÓ®ÿãÝÕB­øøñ¥Sû”¯Þ3øOÞ÷´ýbçèær¦\Þ½íêX°5+$†<!ÔÂ@%dù4*$ƒ§š¼´mÛ}ÌjÆÄò5*l‡WT‡aë„à0L/ŸY¹%Ê¼9¼ÅŸU»!×>?Ø•Ù»ÿb¡„h„€­ñ)<,b¡–ô©wwuæ…A›ß¤m¢EèÃþD0d[:ç\-Å˜ú˜0¡O¶ïM=X2¹ÅŸ×ø%/Ê¥MG¡E A)ù8®â²Ï'èGâ²±•(jÀ}wY‡fu¶ïìWÇ]W„	?<i|RBp„D`ëHbìûµd¢ðñ¥q;5¡[‹¿¡n=JŸÓ¶_½\,|	ÁpP‹†ñ aJ=Biâ["¢¡"7VwhFtì7ûÀ½Oõ8yhW XK¦0çÀV_§z¼f	¤¬ÂÇ‡·ºXÿ’Úu(-_{õq1YLø¾e!ì¡
+`€º”5èzKŸHåÞ]×t—zwš;ûîk£ºKÚªQíöõ„b±(C‚ëu ë#lY?0 ÝÀ¿©‹èÁ’‰P…à©h%>¢²ÒO’žVô|"¤%¹¸»¼©2Wë³¤î=¨fßH¦‚08c\ò„bœ)Á„C” Ê‰Z¡÷¤[ã‡À‚…D@,ß£¡gI*Å’z¡¤+©%Hhy\2.lÖ<—zwy`ýÚµÎÎªsŒñŠF¼û[ÎHQ·Uœ	¡B(ÀXç~˜,‚Äú×Õn*$­dE’„¡"PŒÂ PÉ ù%ˆ°¢ŠÙÂU¹üÒ&A×ƒË;Ló­±Ù<÷µÎýD ÷lo0›Ál[q°h€"¿6cZ‹£vbc-	Îr†#,)õU©È aKS¡D.ÌîÝõþ}iÛvìô]÷ªUgmvÇge…)¯ÁÛJ]€ã‚ÕaTy„£ùàê?ÓäY‰"Ø“EO!ÏÃJ\)8=ÊÐ“Â÷å_øç?¯ë;¥|ûžsÓ„Òõ7Ë’y òéÚKÅêuðÔv+Å(œåàÖeÿTfê2BI…= ¦…/•tYNÜù¼ëèÕï_þqÌÄ~gß6ÏUÏ™Ù·æf³ºOpÕ Þ“Û{$cLåçŠ»B—*r4¸úÕy´¬
+bÈb’¨Šô(‚o®æ|#ï2—‰{uâŸïÔ}ètÙy~îÜóçkŸ™×s¥Ü«à“w¾a‹\<?æÂW$çMkÑê<Û£žì)¥âI¥„×¸x$h°§®›Ë	‘«³<uãÕ«Ùÿââ˜6c§ß¹³³¼Û¨Þ»išWž™ÛÏ½oð\(yø}ƒå… t¹.—@-7ÜlõŸï1%¸.] AðÔcÞÓÆåoÅêOås7Ø±n.Ÿ?ï÷÷ÿ9¦Ë¨òÉ«;w®|ÿüÜÍª™½òÖØ~îÂS!>5*ßVnl¸‚ß€y*!˜È-œùïðzówyˆÃxœ\''qAº¼‚XÔEAÿ§Ny§6Dh”–bÕ£U¸¾Ü+ÍÅÞ]…†(¹Mðz×
+-Ä4–¾Vêâ7Nêl¥ï#ã“'Ÿ'îû;f>`ýž®šhièÞÇØp[ƒaFDÄPÄÿóóñgÞÕ+ïÎ¼á8ÎÄg÷\ç†Š«vçeJ‹ò}È*!7fÖKG/ø[[½j¯jøÀM(¿ª5BbÁYAF\„3<™ûãu0ÓúÈ«{¯ò|…Ö2g®Ù)š5©ßgµGË†°×’¤¼um=Àú§®\.ôªU_ÿ
+­ŒØqÏOê
+Gi^$"š.ââÆÿùšÝsìb§Ññ¼
+øº™ÚêŒfCwäšEë~Y/´ÿdó+ ø¡Y°þÙ-©µV±2‰¿Ù¾– URÆLÆ(ÇˆGàkånìË¬\‡/¾Oç]0vü|n:Nß1‡®ë¼îç‚ixð¯o/ƒ‡_&r½Àú'®èØXjÆÛŽµ®*B8sÀJ„\Pf¯­ú@òñ‹g^Ö¿¯•4°µíI¿ï8fÑ6Æ“‘eˆdG.óE	É®XÿÆ¬bJIdÏ†¼.4K"E‚#Æ1ŽEr‹"
+œ-¬³GNœã¸;{ã¥ªÍóØ:2]w˜¯™›*bqÂwƒ«‚åÖ¬jã²¯E$[ìÄ2Vü„pRŠ  [Ûœ>€{´ù=Šn¬jk»÷TÖ
+¼4Ýíô–w§hNÀØÄÕ5³¦r¡âñºQàüjf7hãroÉ„\|ŠU"¥bS!B„Ã6jñ6¾Å) SŠ-Î¯eWrìèp¶Õ´0N>ÛOGónZ[ã` ð:s§æÝ7“¦DdIÔf'IÄƒõoÈ¥’K;‘J+É0âA³YMSkÑ¥!,xˆ¿ãŠV€Ù‡Ú'q€p=±?=›Ì=¯Û­<9_imÍ¦3ç=Ej‡%ÛùïÙs™Ý££g$øú9Q
++à6GÀTTâ”?|Åy«4°R³-4°š<Ê]ú§?öŸÎ¾¢ã@°¥½ã:n·‰›ý×éÈ3Ý„Bm‘ÊüìFfwiãzê+S‹À² £%Ô~HÛ<|UBaû‹¢a
+$hZ‚ÿKÌ^ÊµÂ 9 Õ”É[oèŒÁVo¼=ù
+§Óéd>é'‘Ÿ¨
+Ì]ì:ýäæÜ]Ã0î¤“Ž‚³èè~@ÒEAPáxCguvÊXè!iÖ¤ùÚ/`i>[£âÇG5ôBi‡€’lŽ(­%gµÖáàä'¼;Ø>ÿAžü¾'—÷½üêÍ§·ï‡ï^v›$½í»(ª¢Û¼|¾†áÐŸ£°v2³ç¹z Ó¬Y†åÙÍðéÓjõ3ImíÅ[ƒ9Äµ ¾:ó“êÛ³ÿw·úžöŸy÷þÝöpØ5à²	o#QŸ§„€³¡‡ŠaD–å†×íþ“Îµ÷ ZÓÈ³F‹ãn?ë¶z÷ÀÙè
+¾6ðõ£3¹Ó$ÛëËÖoß ¾ß~Z ø6Ï†)A:¡>bÁ\)6Ž"#uw:5º™¿}´Ýy<c[ÚÈ%†âaLëÞ›xRø’W§•æµàŒgñ¸ßøX²™eë·˜…À6Cß&MÆÆHõ}ÅöQ¤#Lí&Vr8çµ†°œ§Ú\ÿ»5—2Œ­•`'g`%6Q¬i5ž4À×^ïá|>L>fñ¬Ðž¼@—¥[}W-dúQÊˆ*òuùCj9=b“…Á™ž‡àáææ¦g¯Ÿÿcì^Ëè‰[‚aà‘%	²‘©X^6pÒ¸ö'[ƒø
+x[í´-¿EØ&¢—
+ Dåå©è‹fÄG·”+Ø˜B`ŸõyÑ¹ƒ»þ¬[­SÓz4r…ÒýQ”à„WZÚ3g§õ5Ì°à«Çø…e5túfA<ÝÐ)DVRuNÊ™ºN+¦›TìE”LK‚0‹AsÝ#¿Ù]Ç×$–cSx´K£ ‰8ŽåQ„ï÷Çƒ¸j|ÁÀd<ž=ûxdÇêèØºÈKºHxúQ¿XÁüFH‘‘(fä>´×ÜSöýîÜ…jŠX£z °âcS³&Ê´ÍÂVœö×´e¯€sKØX ý©*q:Ö%N"”—²ZqC”óE.W–97ÐÚ÷ã±p{Q©È•ßÚ=}ðð‰¼þ$k&$µµ@{¦Ü7²ÈÕ´ÙdÐK•¶9øzeUðfP*³ºOUÄ0”e9žÏŠy¶ò€]˜·\ˆ™p¿­ÝqµJyÁÑµ£{uøòÄŽÓo=(²•Š{£¸õ œíÕ|Ž•“v»Uˆ®³VÊÂõÕs5Õ±Œ”§º$eU¢>ÏË¢,Ÿo˜9ù®,ær7'x\¯wÌ ,ñêÚU8Á~¾3lMÍÞÊgŸ—Ÿ<Éæ^È0ÅÞ©²YdUîy¹¨µùÍ8þÒ^Á×«…€Ïìœ»Ê×0Æ¼ £8ª(NŠ‹ â¨ƒ88H† $„6$J
+5K¡&ÈGÉ \>¬ƒ‡.]þ.".Àº© ˆ<>th×‡ðëóæMÞ½¼µe„$÷@†¡AÂ²l)šœ½{§.loã[CCN)VGï8²oÏ"ÀÁÃ{sµ…¸¢,[Û¸§Â=½µZ…6Ø-ƒºQ¿~²ýhÍYÛër½þ×ººj÷^Á–†mUF6•1PJ%ÐÕO‹íþÁƒ¡nžéÀ2Zÿa'ú	;÷ï?täÜá@9”UžÙ[Cû!¹·£%ç¶‹'›‹W×~§#¸?C»/-•€Ó\l£mB©º/7¯7·îÜ	CMßF­¡†À*¤©Öô{¹pðÂÁƒ9¹÷Œ×išdù‚–<ÙNûõþz]bK±žáÆ[wŸ<yùp5öÚ¯?ËøÓµÂÀ(ÄÁ"™c:¦i|£©pñz³yÐ×wg"	9gˆ}ad BÈÉ##Œº	”`†“…hÉê´«ïÜ¹Û÷!ÅbÔÄww7÷_½OYânà7•¶®Mf[I0Ùé‰¤Ñwo=Ø¾»]Þòóu|ëR¤À«J  4F½aBªvKq"`å81 ¥‚†Šl}NÖc\ö5VÄOZO!àÛOÖÝ×³CÑúµ˜%rp’iI¬·av	¯cy^nÖå6âq¤É­!4ÜVhc!«¥¬$”@6(t“)¤Øj$]}¬Çžeö:Ç›WÏ®üÙê³Î^ÖùmÐ9kj§9¹±,ûþÁëbÆ>h7y›‰um†HòV¢F!`Ë(¥JZ€Pµ²áË@rJV¦Øáö·“ÏÌxóêo*Z¿³DÛ<Í>ÅÃXß-6›×e*ºç:h˜sTPœ'è jD@T„Bô‚ˆE=OSôÁ÷uý8'/užBýàïM¬_Ð®Ã. ½öIÏÇwß®³¤
+Ÿð—LÑRŠÀ…ƒpiB@³%aÜ‹ÛÊ#,'€sÏMaž¢MÝ\ö¸œg=ÍpRcþ+v¿mrLZtôãÒó¢.6Û:ì±·Ië´g\Ê0 åáoþ&0Æ›r.©¢yÜ­ï·ÕèµM£î
+¼²`ŽogÝÕ¬ëÔUçnšÇMWnV_Ë~´=ÖÝ4ŽÄ†­7î@Ëq œ;Æ…U‚Ò…sËß@˜¬M:tåZàÎN!}~Ç¿­óWµŽÚ]÷õë¢èjïKï“¶š®ÍšnJ“mT8 $çrB‚Vð-‚ÃàÓ4-sW–uYtØE­ÿñm–ï‡Áõ.Gp½ýz-¸Š²Ãx^mÊ4((…€–Y64¼… + \9+‘0@ÄBU#4Ñ1y×”uëŽ‹éâÿõ~&Ï{Sz¼ÙÞý
+ØF§‰¬Ž1aeC”¬$"@ÑVCc ,oØ`«"œAE½ž£ŸS×}ïÿ5m–q×v.W¬|Å8y<N)ø‘5p©`¬Æ0·~BÚ*ƒÞÐ¥¡¡HˆJ˜%-Ø<Û®Xó þ'³Õœ-ž­mèÅë¹sÝ<Ù†F•!  ÏŠ‘VÐ@Ò²¥e ‚8˜-r[Pô†è”S½ïû¿¬Íò#`PwŸ¸Æ}ŸbÒÁ‹PÜHEiËmK ¯lc„ 1Øˆ ’@ §)G?y_ü…m–àìÕ6wÇ¢Cšâú¼'¬¼É‰j’í{²:ÀØG %¤ÊtˆšuL™¤pú_ÏVŸÓÁkÅëò.è´Øian0VÁÅÅ­Š,À9eµ°†È[F€P<Óe‹ÂfžÞÊYÿ+»ß¢cÛ%®kŸ–˜Ç`‘l$@ˆÂÕÃ, ‚è†"H5Goihcz»ýÞµhýZÌv¸¾“b“ª%1V©²ÆÂJ:8°IH¥sŒ"bZhƒýÖ¯˜=k7½51RÜ›–CÐmÉm 7 (Š„Zv°Š/ñ?XßµoÆ¨1=Œq“2ur nBªÝ*uØ2Û©X˜Ñ "(,3Án!¤ØÊ‡H½—ð²G°qcð¼RåGýÿ<kûÍ‡ÏÕÉ
+˜É äÔ"œ$Po	=ƒc‚!ó1B×ÖÃzö7{XÖÈÛ, y!PA%C„è‘†	sÞå©ªz	û9¥ˆÁi1ùmv«/˜¾tcL,¨±Ì ùý¹,²yìj…‰
+óä9¸%žÆIe:ëŸn¿%x“¼¼íz,ÀQ5)P·ðÔñkÛÔM½ŠÍ¾iû¾Ã1;’ß®ÛnwÍCÕô^ùçlt½*7Ù    IEND®B`‚
+
+### D:\Projects\AI_AGENTIC_DEV_PROJECT\TaskFlow-agent-frontend\frontend\taskflow-web\src\assets\react.svg
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="35.93" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 228"><path fill="#00D8FF" d="M210.483 73.824a171.49 171.49 0 0 0-8.24-2.597c.465-1.9.893-3.777 1.273-5.621c6.238-30.281 2.16-54.676-11.769-62.708c-13.355-7.7-35.196.329-57.254 19.526a171.23 171.23 0 0 0-6.375 5.848a155.866 155.866 0 0 0-4.241-3.917C100.759 3.829 77.587-4.822 63.673 3.233C50.33 10.957 46.379 33.89 51.995 62.588a170.974 170.974 0 0 0 1.892 8.48c-3.28.932-6.445 1.924-9.474 2.98C17.309 83.498 0 98.307 0 113.668c0 15.865 18.582 31.778 46.812 41.427a145.52 145.52 0 0 0 6.921 2.165a167.467 167.467 0 0 0-2.01 9.138c-5.354 28.2-1.173 50.591 12.134 58.266c13.744 7.926 36.812-.22 59.273-19.855a145.567 145.567 0 0 0 5.342-4.923a168.064 168.064 0 0 0 6.92 6.314c21.758 18.722 43.246 26.282 56.54 18.586c13.731-7.949 18.194-32.003 12.4-61.268a145.016 145.016 0 0 0-1.535-6.842c1.62-.48 3.21-.974 4.76-1.488c29.348-9.723 48.443-25.443 48.443-41.52c0-15.417-17.868-30.326-45.517-39.844Zm-6.365 70.984c-1.4.463-2.836.91-4.3 1.345c-3.24-10.257-7.612-21.163-12.963-32.432c5.106-11 9.31-21.767 12.459-31.957c2.619.758 5.16 1.557 7.61 2.4c23.69 8.156 38.14 20.213 38.14 29.504c0 9.896-15.606 22.743-40.946 31.14Zm-10.514 20.834c2.562 12.94 2.927 24.64 1.23 33.787c-1.524 8.219-4.59 13.698-8.382 15.893c-8.067 4.67-25.32-1.4-43.927-17.412a156.726 156.726 0 0 1-6.437-5.87c7.214-7.889 14.423-17.06 21.459-27.246c12.376-1.098 24.068-2.894 34.671-5.345a134.17 134.17 0 0 1 1.386 6.193ZM87.276 214.515c-7.882 2.783-14.16 2.863-17.955.675c-8.075-4.657-11.432-22.636-6.853-46.752a156.923 156.923 0 0 1 1.869-8.499c10.486 2.32 22.093 3.988 34.498 4.994c7.084 9.967 14.501 19.128 21.976 27.15a134.668 134.668 0 0 1-4.877 4.492c-9.933 8.682-19.886 14.842-28.658 17.94ZM50.35 144.747c-12.483-4.267-22.792-9.812-29.858-15.863c-6.35-5.437-9.555-10.836-9.555-15.216c0-9.322 13.897-21.212 37.076-29.293c2.813-.98 5.757-1.905 8.812-2.773c3.204 10.42 7.406 21.315 12.477 32.332c-5.137 11.18-9.399 22.249-12.634 32.792a134.718 134.718 0 0 1-6.318-1.979Zm12.378-84.26c-4.811-24.587-1.616-43.134 6.425-47.789c8.564-4.958 27.502 2.111 47.463 19.835a144.318 144.318 0 0 1 3.841 3.545c-7.438 7.987-14.787 17.08-21.808 26.988c-12.04 1.116-23.565 2.908-34.161 5.309a160.342 160.342 0 0 1-1.76-7.887Zm110.427 27.268a347.8 347.8 0 0 0-7.785-12.803c8.168 1.033 15.994 2.404 23.343 4.08c-2.206 7.072-4.956 14.465-8.193 22.045a381.151 381.151 0 0 0-7.365-13.322Zm-45.032-43.861c5.044 5.465 10.096 11.566 15.065 18.186a322.04 322.04 0 0 0-30.257-.006c4.974-6.559 10.069-12.652 15.192-18.18ZM82.802 87.83a323.167 323.167 0 0 0-7.227 13.238c-3.184-7.553-5.909-14.98-8.134-22.152c7.304-1.634 15.093-2.97 23.209-3.984a321.524 321.524 0 0 0-7.848 12.897Zm8.081 65.352c-8.385-.936-16.291-2.203-23.593-3.793c2.26-7.3 5.045-14.885 8.298-22.6a321.187 321.187 0 0 0 7.257 13.246c2.594 4.48 5.28 8.868 8.038 13.147Zm37.542 31.03c-5.184-5.592-10.354-11.779-15.403-18.433c4.902.192 9.899.29 14.978.29c5.218 0 10.376-.117 15.453-.343c-4.985 6.774-10.018 12.97-15.028 18.486Zm52.198-57.817c3.422 7.8 6.306 15.345 8.596 22.52c-7.422 1.694-15.436 3.058-23.88 4.071a382.417 382.417 0 0 0 7.859-13.026a347.403 347.403 0 0 0 7.425-13.565Zm-16.898 8.101a358.557 358.557 0 0 1-12.281 19.815a329.4 329.4 0 0 1-23.444.823c-7.967 0-15.716-.248-23.178-.732a310.202 310.202 0 0 1-12.513-19.846h.001a307.41 307.41 0 0 1-10.923-20.627a310.278 310.278 0 0 1 10.89-20.637l-.001.001a307.318 307.318 0 0 1 12.413-19.761c7.613-.576 15.42-.876 23.31-.876H128c7.926 0 15.743.303 23.354.883a329.357 329.357 0 0 1 12.335 19.695a358.489 358.489 0 0 1 11.036 20.54a329.472 329.472 0 0 1-11 20.722Zm22.56-122.124c8.572 4.944 11.906 24.881 6.52 51.026c-.344 1.668-.73 3.367-1.15 5.09c-10.622-2.452-22.155-4.275-34.23-5.408c-7.034-10.017-14.323-19.124-21.64-27.008a160.789 160.789 0 0 1 5.888-5.4c18.9-16.447 36.564-22.941 44.612-18.3ZM128 90.808c12.625 0 22.86 10.235 22.86 22.86s-10.235 22.86-22.86 22.86s-22.86-10.235-22.86-22.86s10.235-22.86 22.86-22.86Z"></path></svg>
+
+### D:\Projects\AI_AGENTIC_DEV_PROJECT\TaskFlow-agent-frontend\frontend\taskflow-web\src\assets\vite.svg
+<svg xmlns="http://www.w3.org/2000/svg" width="77" height="47" fill="none" aria-labelledby="vite-logo-title" viewBox="0 0 77 47"><title id="vite-logo-title">Vite</title><style>.parenthesis{fill:#000}@media (prefers-color-scheme:dark){.parenthesis{fill:#fff}}</style><path fill="#9135ff" d="M40.151 45.71c-.663.844-2.02.374-2.02-.699V34.708a2.26 2.26 0 0 0-2.262-2.262H24.493c-.92 0-1.457-1.04-.92-1.788l7.479-10.471c1.07-1.498 0-3.578-1.842-3.578H15.443c-.92 0-1.456-1.04-.92-1.788l9.696-13.576c.213-.297.556-.474.92-.474h28.894c.92 0 1.456 1.04.92 1.788l-7.48 10.472c-1.07 1.497 0 3.578 1.842 3.578h11.376c.944 0 1.474 1.087.89 1.83L40.153 45.712z"/><mask id="a" width="48" height="47" x="14" y="0" maskUnits="userSpaceOnUse" style="mask-type:alpha"><path fill="#000" d="M40.047 45.71c-.663.843-2.02.374-2.02-.699V34.708a2.26 2.26 0 0 0-2.262-2.262H24.389c-.92 0-1.457-1.04-.92-1.788l7.479-10.472c1.07-1.497 0-3.578-1.842-3.578H15.34c-.92 0-1.456-1.04-.92-1.788l9.696-13.575c.213-.297.556-.474.92-.474H53.93c.92 0 1.456 1.04.92 1.788L47.37 13.03c-1.07 1.498 0 3.578 1.842 3.578h11.376c.944 0 1.474 1.088.89 1.831L40.049 45.712z"/></mask><g mask="url(#a)"><g filter="url(#b)"><ellipse cx="5.508" cy="14.704" fill="#eee6ff" rx="5.508" ry="14.704" transform="rotate(269.814 20.96 11.29)scale(-1 1)"/></g><g filter="url(#c)"><ellipse cx="10.399" cy="29.851" fill="#eee6ff" rx="10.399" ry="29.851" transform="rotate(89.814 -16.902 -8.275)scale(1 -1)"/></g><g filter="url(#d)"><ellipse cx="5.508" cy="30.487" fill="#8900ff" rx="5.508" ry="30.487" transform="rotate(89.814 -19.197 -7.127)scale(1 -1)"/></g><g filter="url(#e)"><ellipse cx="5.508" cy="30.599" fill="#8900ff" rx="5.508" ry="30.599" transform="rotate(89.814 -25.928 4.177)scale(1 -1)"/></g><g filter="url(#f)"><ellipse cx="5.508" cy="30.599" fill="#8900ff" rx="5.508" ry="30.599" transform="rotate(89.814 -25.738 5.52)scale(1 -1)"/></g><g filter="url(#g)"><ellipse cx="14.072" cy="22.078" fill="#eee6ff" rx="14.072" ry="22.078" transform="rotate(93.35 31.245 55.578)scale(-1 1)"/></g><g filter="url(#h)"><ellipse cx="3.47" cy="21.501" fill="#8900ff" rx="3.47" ry="21.501" transform="rotate(89.009 35.419 55.202)scale(-1 1)"/></g><g filter="url(#i)"><ellipse cx="3.47" cy="21.501" fill="#8900ff" rx="3.47" ry="21.501" transform="rotate(89.009 35.419 55.202)scale(-1 1)"/></g><g filter="url(#j)"><ellipse cx="14.592" cy="9.743" fill="#8900ff" rx="4.407" ry="29.108" transform="rotate(39.51 14.592 9.743)"/></g><g filter="url(#k)"><ellipse cx="61.728" cy="-5.321" fill="#8900ff" rx="4.407" ry="29.108" transform="rotate(37.892 61.728 -5.32)"/></g><g filter="url(#l)"><ellipse cx="55.618" cy="7.104" fill="#00c2ff" rx="5.971" ry="9.665" transform="rotate(37.892 55.618 7.104)"/></g><g filter="url(#m)"><ellipse cx="12.326" cy="39.103" fill="#8900ff" rx="4.407" ry="29.108" transform="rotate(37.892 12.326 39.103)"/></g><g filter="url(#n)"><ellipse cx="12.326" cy="39.103" fill="#8900ff" rx="4.407" ry="29.108" transform="rotate(37.892 12.326 39.103)"/></g><g filter="url(#o)"><ellipse cx="49.857" cy="30.678" fill="#8900ff" rx="4.407" ry="29.108" transform="rotate(37.892 49.857 30.678)"/></g><g filter="url(#p)"><ellipse cx="52.623" cy="33.171" fill="#00c2ff" rx="5.971" ry="15.297" transform="rotate(37.892 52.623 33.17)"/></g></g><path d="M6.919 0c-9.198 13.166-9.252 33.575 0 46.789h6.215c-9.25-13.214-9.196-33.623 0-46.789zm62.424 0h-6.215c9.198 13.166 9.252 33.575 0 46.789h6.215c9.25-13.214 9.196-33.623 0-46.789" class="parenthesis"/><defs><filter id="b" width="60.045" height="41.654" x="-5.564" y="16.92" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="7.659"/></filter><filter id="c" width="90.34" height="51.437" x="-40.407" y="-6.762" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="7.659"/></filter><filter id="d" width="79.355" height="29.4" x="-35.435" y="2.801" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="e" width="79.579" height="29.4" x="-30.84" y="20.8" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="f" width="79.579" height="29.4" x="-29.307" y="21.949" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="g" width="74.749" height="58.852" x="29.961" y="-17.13" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="7.659"/></filter><filter id="h" width="61.377" height="25.362" x="37.754" y="3.055" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="i" width="61.377" height="25.362" x="37.754" y="3.055" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="j" width="56.045" height="63.649" x="-13.43" y="-22.082" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="k" width="54.814" height="64.646" x="34.321" y="-37.644" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="l" width="33.541" height="35.313" x="38.847" y="-10.552" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="m" width="54.814" height="64.646" x="-15.081" y="6.78" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="n" width="54.814" height="64.646" x="-15.081" y="6.78" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="o" width="54.814" height="64.646" x="22.45" y="-1.645" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="p" width="39.409" height="43.623" x="32.919" y="11.36" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter></defs></svg>
+
+
+### D:\Projects\AI_AGENTIC_DEV_PROJECT\TaskFlow-agent-frontend\frontend\taskflow-web\src\components\TaskCard.tsx
+import { useState, type FormEvent } from 'react'
+import { TASK_STATUSES, type Task, type TaskStatus, type UpdateTaskInput } from '../types/task'
+
+interface Props {
+  task: Task
+  isBusy: boolean
+  onUpdate: (id: string, input: UpdateTaskInput) => Promise<boolean>
+  onDelete: (id: string) => Promise<void>
+}
+
+export function TaskCard({ task, isBusy, onUpdate, onDelete }: Props) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [title, setTitle] = useState(task.title)
+  const [description, setDescription] = useState(task.description ?? '')
+  const [validationError, setValidationError] = useState('')
+
+  async function handleEdit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const trimmedTitle = title.trim()
+    if (!trimmedTitle) {
+      setValidationError('Please enter a task title.')
+      return
+    }
+    setValidationError('')
+    if (await onUpdate(task.id, { title: trimmedTitle, description })) setIsEditing(false)
+  }
+
+  function cancelEdit() {
+    setTitle(task.title)
+    setDescription(task.description ?? '')
+    setValidationError('')
+    setIsEditing(false)
+  }
+
+  if (isEditing) return (
+    <li className="task-card panel"><form className="edit-form" onSubmit={handleEdit}>
+      <label>Title<input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={150} disabled={isBusy} required /></label>
+      <label>Description <span className="optional">Optional</span><textarea value={description} onChange={(event) => setDescription(event.target.value)} maxLength={1000} rows={3} disabled={isBusy} /></label>
+      {validationError && <p className="field-error" role="alert">{validationError}</p>}
+      <div className="card-actions"><button className="primary-button" type="submit" disabled={isBusy}>{isBusy ? 'Savingâ€¦' : 'Save'}</button><button className="text-button" type="button" onClick={cancelEdit} disabled={isBusy}>Cancel</button></div>
+    </form></li>
+  )
+
+  return (
+    <li className="task-card panel">
+      <div className="task-content"><div><h3>{task.title}</h3>{task.description && <p className="task-description">{task.description}</p>}</div>
+        <label className="status-control"><span className="sr-only">Status for {task.title}</span><select className={`status status-${task.status.toLowerCase()}`} value={task.status} onChange={(event) => void onUpdate(task.id, { status: event.target.value as TaskStatus })} disabled={isBusy}>{TASK_STATUSES.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
+      </div>
+      <div className="task-meta"><span>Updated {new Date(task.updatedAt).toLocaleString()}</span><div className="card-actions"><button className="text-button" type="button" onClick={() => setIsEditing(true)} disabled={isBusy}>Edit</button><button className="danger-button" type="button" onClick={() => void onDelete(task.id)} disabled={isBusy}>{isBusy ? 'Workingâ€¦' : 'Delete'}</button></div></div>
+    </li>
+  )
+}
+
+
+### D:\Projects\AI_AGENTIC_DEV_PROJECT\TaskFlow-agent-frontend\frontend\taskflow-web\src\components\TaskForm.tsx
+import { useState, type FormEvent } from 'react'
+import { TASK_STATUSES, type CreateTaskInput, type TaskStatus } from '../types/task'
+
+interface Props {
+  isSubmitting: boolean
+  onSubmit: (input: CreateTaskInput) => Promise<boolean>
+}
+
+export function TaskForm({ isSubmitting, onSubmit }: Props) {
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [status, setStatus] = useState<TaskStatus>('Pending')
+  const [validationError, setValidationError] = useState('')
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const trimmedTitle = title.trim()
+    if (!trimmedTitle) {
+      setValidationError('Please enter a task title.')
+      return
+    }
+    setValidationError('')
+    if (await onSubmit({ title: trimmedTitle, description, status })) {
+      setTitle('')
+      setDescription('')
+      setStatus('Pending')
+    }
+  }
+
+  return (
+    <form className="task-form panel" onSubmit={handleSubmit}>
+      <div className="section-heading"><div><p className="eyebrow">New task</p><h2>Add something to your flow</h2></div></div>
+      <label>Title<input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={150} placeholder="What needs to be done?" disabled={isSubmitting} required /></label>
+      <label>Description <span className="optional">Optional</span><textarea value={description} onChange={(event) => setDescription(event.target.value)} maxLength={1000} placeholder="Add a little context" disabled={isSubmitting} rows={3} /></label>
+      <div className="form-row">
+        <label>Status<select value={status} onChange={(event) => setStatus(event.target.value as TaskStatus)} disabled={isSubmitting}>{TASK_STATUSES.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
+        <button className="primary-button" type="submit" disabled={isSubmitting}>{isSubmitting ? 'Addingâ€¦' : 'Add task'}</button>
+      </div>
+      {validationError && <p className="field-error" role="alert">{validationError}</p>}
+    </form>
+  )
+}
+
+
+### D:\Projects\AI_AGENTIC_DEV_PROJECT\TaskFlow-agent-frontend\frontend\taskflow-web\src\components\TaskList.tsx
+import type { Task, UpdateTaskInput } from '../types/task'
+import { TaskCard } from './TaskCard'
+
+interface Props {
+  tasks: Task[]
+  busyTaskId: string | null
+  onUpdate: (id: string, input: UpdateTaskInput) => Promise<boolean>
+  onDelete: (id: string) => Promise<void>
+}
+
+export function TaskList({ tasks, busyTaskId, onUpdate, onDelete }: Props) {
+  if (tasks.length === 0) return <div className="empty-state panel"><span aria-hidden="true">âœ“</span><h3>Your task list is clear</h3><p>Add a task above when youâ€™re ready to get moving.</p></div>
+  return <ul className="task-list">{tasks.map((task) => <TaskCard key={task.id} task={task} isBusy={busyTaskId === task.id} onUpdate={onUpdate} onDelete={onDelete} />)}</ul>
+}
+
+
+### D:\Projects\AI_AGENTIC_DEV_PROJECT\TaskFlow-agent-frontend\frontend\taskflow-web\src\types\task.ts
+export const TASK_STATUSES = ['Pending', 'InProgress', 'Completed'] as const
+
+export type TaskStatus = (typeof TASK_STATUSES)[number]
+
+export interface Task {
+  id: string
+  title: string
+  description?: string
+  status: TaskStatus
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateTaskInput {
+  title: string
+  description?: string
+  status?: TaskStatus
+}
+
+export interface UpdateTaskInput {
+  title?: string
+  description?: string
+  status?: TaskStatus
+}
+
+
+codex
+The existing frontend already contains the requested component structure and all required flows. The documented contract and architecture are compatible: it uses `id`, the three exact statuses, `PATCH`, `DELETE` with 204 handling, centralized API access, and `VITE_API_BASE_URL`.
+
+Before editing, the files potentially affected are `src/App.tsx`, `src/api/tasksApi.ts`, `src/components/{TaskForm,TaskList,TaskCard}.tsx`, `src/types/task.ts`, and the two CSS files. I found no contract blocker. I’m now validating the implementation and build to identify the smallest changes actually needed; I won’t rewrite working areas unnecessarily.
+exec
+"C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'npm run build' in D:\Projects\AI_AGENTIC_DEV_PROJECT\TaskFlow-agent-frontend\frontend\taskflow-web
+ exited 1 in 3774ms:
+
+> taskflow-web@0.0.0 build
+> tsc -b && vite build
+
+failed to load config from D:\Projects\AI_AGENTIC_DEV_PROJECT\TaskFlow-agent-frontend\frontend\taskflow-web\vite.config.ts
+error during build:
+Error: Build failed with 1 error:
+
+[plugin externalize-deps]
+Error: spawn EPERM
+    at ChildProcess.spawn (node:internal/child_process:420:11)
+    at spawn (node:child_process:787:9)
+    at Object.execFile (node:child_process:349:17)
+    at exec (node:child_process:236:25)
+    at optimizeSafeRealPathSync (file:///D:/Projects/AI_AGENTIC_DEV_PROJECT/TaskFlow-agent-frontend/frontend/taskflow-web/node_modules/vite/dist/node/chunks/node.js:2497:2)
+    at windowsSafeRealPathSync (file:///D:/Projects/AI_AGENTIC_DEV_PROJECT/TaskFlow-agent-frontend/frontend/taskflow-web/node_modules/vite/dist/node/chunks/node.js:2483:3)
+    at getRealPath (file:///D:/Projects/AI_AGENTIC_DEV_PROJECT/TaskFlow-agent-frontend/frontend/taskflow-web/node_modules/vite/dist/node/chunks/node.js:33260:36)
+    at tryResolveRealFileOrType (file:///D:/Projects/AI_AGENTIC_DEV_PROJECT/TaskFlow-agent-frontend/frontend/taskflow-web/node_modules/vite/dist/node/chunks/node.js:33254:9)
+    at tryCleanFsResolve (file:///D:/Projects/AI_AGENTIC_DEV_PROJECT/TaskFlow-agent-frontend/frontend/taskflow-web/node_modules/vite/dist/node/chunks/node.js:33003:21)
+    at tryFsResolve (file:///D:/Projects/AI_AGENTIC_DEV_PROJECT/TaskFlow-agent-frontend/frontend/taskflow-web/node_modules/vite/dist/node/chunks/node.js:32996:14)
+    at aggregateBindingErrorsIntoJsError (file:///D:/Projects/AI_AGENTIC_DEV_PROJECT/TaskFlow-agent-frontend/frontend/taskflow-web/node_modules/rolldown/dist/shared/error-NcRuXAVN.mjs:48:18)
+    at unwrapBindingResult (file:///D:/Projects/AI_AGENTIC_DEV_PROJECT/TaskFlow-agent-frontend/frontend/taskflow-web/node_modules/rolldown/dist/shared/error-NcRuXAVN.mjs:18:128)
+    at #build (file:///D:/Projects/AI_AGENTIC_DEV_PROJECT/TaskFlow-agent-frontend/frontend/taskflow-web/node_modules/rolldown/dist/shared/rolldown-vcii7mEa.mjs:132:34)
+    at async bundleConfigFile (file:///D:/Projects/AI_AGENTIC_DEV_PROJECT/TaskFlow-agent-frontend/frontend/taskflow-web/node_modules/vite/dist/node/chunks/node.js:37116:17)
+    at async bundleAndLoadConfigFile (file:///D:/Projects/AI_AGENTIC_DEV_PROJECT/TaskFlow-agent-frontend/frontend/taskflow-web/node_modules/vite/dist/node/chunks/node.js:37014:18)
+    at async loadConfigFromFile (file:///D:/Projects/AI_AGENTIC_DEV_PROJECT/TaskFlow-agent-frontend/frontend/taskflow-web/node_modules/vite/dist/node/chunks/node.js:36975:42)
+    at async resolveConfig (file:///D:/Projects/AI_AGENTIC_DEV_PROJECT/TaskFlow-agent-frontend/frontend/taskflow-web/node_modules/vite/dist/node/chunks/node.js:36581:22)
+    at async createBuilder (file:///D:/Projects/AI_AGENTIC_DEV_PROJECT/TaskFlow-agent-frontend/frontend/taskflow-web/node_modules/vite/dist/node/chunks/node.js:34217:17)
+    at async CAC.<anonymous> (file:///D:/Projects/AI_AGENTIC_DEV_PROJECT/TaskFlow-agent-frontend/frontend/taskflow-web/node_modules/vite/dist/node/cli.js:765:19) {
+  errors: [Getter/Setter]
+}
+
+ERROR: Selected model is at capacity. Please try a different model.
+ERROR: Selected model is at capacity. Please try a different model.
+tokens used
+34,278

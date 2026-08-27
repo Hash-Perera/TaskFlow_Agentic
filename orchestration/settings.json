@@ -1,0 +1,6 @@
+{
+  "maxParallelWorkers": 2,
+  "workerTimeoutMinutes": 20,
+  "maxAttempts": 3,
+  "pollIntervalSeconds": 2
+}

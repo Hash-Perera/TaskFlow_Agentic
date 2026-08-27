@@ -37,3 +37,7 @@ mongodb-data/
 # Temporary files
 *.tmp
 *.temp
+
+# orchestration/generated/
+# orchestration/logs/
+orchestration/state.json
