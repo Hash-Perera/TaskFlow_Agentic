@@ -1,0 +1,52 @@
+{
+  "tasks": [
+    {
+      "id": "TASK-001",
+      "name": "Backend CRUD",
+      "owner": "backend-worker",
+      "state": "READY",
+      "dependencies": [],
+      "branch": "agent/task-001-backend-crud",
+      "worktree": "../TaskFlow-agent-backend",
+      "scope": [
+        "backend/taskflow-api/**"
+      ],
+      "verification": [
+        "npm run build",
+        "npm test"
+      ]
+    },
+    {
+      "id": "TASK-002",
+      "name": "Frontend UI",
+      "owner": "frontend-worker",
+      "state": "READY",
+      "dependencies": [],
+      "branch": "agent/task-002-frontend-ui",
+      "worktree": "../TaskFlow-agent-frontend",
+      "scope": [
+        "frontend/taskflow-web/**"
+      ],
+      "verification": [
+        "npm run build"
+      ]
+    },
+    {
+      "id": "TASK-003",
+      "name": "Backend Tests",
+      "owner": "testing-worker",
+      "state": "BLOCKED",
+      "dependencies": [
+        "TASK-001"
+      ],
+      "branch": "agent/task-003-tests",
+      "worktree": "../TaskFlow-agent-tests",
+      "scope": [
+        "backend/taskflow-api/test/**"
+      ],
+      "verification": [
+        "npm test"
+      ]
+    }
+  ]
+}

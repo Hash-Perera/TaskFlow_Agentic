@@ -1,0 +1,44 @@
+You are {{ROLE}} for TaskFlow.
+
+Read first:
+
+- AGENTS.md
+- docs/requirements.md
+- docs/acceptance-criteria.md
+- docs/api-contract.md
+- docs/architecture.md
+- {{TASK_FILE}}
+
+Assigned task:
+
+{{TASK_ID}} — {{TASK_NAME}}
+
+Allowed modification scope:
+
+{{ALLOWED_SCOPE}}
+
+Do not modify:
+
+{{FORBIDDEN_SCOPE}}
+
+Before editing:
+
+1. Inspect the current implementation.
+2. Identify files you expect to change.
+3. Report blockers or contract conflicts.
+4. Do not silently expand scope.
+
+Implement the assigned task.
+
+Verification:
+
+{{VERIFICATION}}
+
+Completion report:
+
+- files changed
+- summary
+- verification commands/results
+- assumptions
+- blockers
+- scope confirmation

@@ -1,0 +1,40 @@
+{
+  "workers": [
+    {
+      "id": "backend-worker",
+      "role": "Backend Implementation Worker",
+      "allowedScope": [
+        "backend/taskflow-api/**"
+      ],
+      "forbiddenScope": [
+        "frontend/**",
+        "docs/**",
+        "AGENTS.md"
+      ]
+    },
+    {
+      "id": "frontend-worker",
+      "role": "Frontend Implementation Worker",
+      "allowedScope": [
+        "frontend/taskflow-web/**"
+      ],
+      "forbiddenScope": [
+        "backend/**",
+        "docs/**",
+        "AGENTS.md"
+      ]
+    },
+    {
+      "id": "testing-worker",
+      "role": "Independent Testing Worker",
+      "allowedScope": [
+        "backend/taskflow-api/test/**"
+      ],
+      "forbiddenScope": [
+        "frontend/**",
+        "docs/**",
+        "AGENTS.md"
+      ]
+    }
+  ]
+}
