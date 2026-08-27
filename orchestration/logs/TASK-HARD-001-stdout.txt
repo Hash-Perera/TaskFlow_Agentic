@@ -1,0 +1,4310 @@
+OpenAI Codex v0.150.1
+--------
+workdir: D:\Projects\AI_AGENTIC_DEV_PROJECT\TaskFlow-agent-hard-001
+model: gpt-5.6-sol
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR]
+reasoning effort: none
+reasoning summaries: none
+session id: 01a04366-f677-7782-b831-0ea30ad96c20
+--------
+user
+You are Backend Implementation Worker for TaskFlow.
+
+You are running in an isolated Git worktree.
+
+Read first:
+
+- AGENTS.md
+- docs/requirements.md
+- docs/acceptance-criteria.md
+- docs/api-contract.md
+- docs/architecture.md
+- docs/tasks/TASK-HARD-001.md
+
+Assigned task:
+
+TASK-HARD-001 ??? Scheduler Hardening Test
+
+Allowed modification scope:
+
+- backend/taskflow-api/**
+
+Do not modify:
+
+- frontend/**
+- docs/**
+- AGENTS.md
+
+Before editing:
+
+1. Inspect the current implementation.
+2. Confirm the relevant architecture and contract requirements.
+3. Identify the files you expect to modify.
+4. Report blockers or contract conflicts.
+5. Do not silently expand scope.
+
+Then implement the assigned task.
+
+Do not modify shared contracts or architecture.
+
+Verification:
+
+- No production changes required
+
+If verification fails because of your changes:
+- investigate the cause
+- fix only issues caused by or directly required by the assigned task
+- rerun verification
+
+Do not weaken correct tests merely to make them pass.
+
+Completion report:
+
+- files changed
+- implementation summary
+- packages changed
+- verification commands executed
+- verification results
+- assumptions
+- blockers
+- unresolved issues
+- confirmation that scope was respected
+
+Do not merge into main.
+Do not delete branches or worktrees.
+
+
+
+codex
+I’ll first read the governing docs and inspect the backend’s current tests and scheduler-related code. Before editing, I’ll report the contract/architecture findings, expected files, and any blockers; I’ll keep all changes within `backend/taskflow-api/**`.
+exec
+"C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'Get-Content -Raw AGENTS.md; Get-Content -Raw docs/requirements.md; Get-Content -Raw docs/acceptance-criteria.md; Get-Content -Raw docs/api-contract.md; Get-Content -Raw docs/architecture.md; Get-Content -Raw docs/tasks/TASK-HARD-001.md' in D:\Projects\AI_AGENTIC_DEV_PROJECT\TaskFlow-agent-hard-001
+ exited 1 in 169ms:
+# TaskFlow Agent Instructions
+
+## 1. Project Purpose
+
+TaskFlow is a small task-management application used to practice professional AI-assisted and agentic software development.
+
+The project intentionally focuses on:
+
+* agent task decomposition
+* parallel agent development
+* orchestration
+* Git worktree isolation
+* contract-first development
+* automated verification
+* AI-assisted code review
+* human-in-the-loop approval
+
+The application itself should remain intentionally simple.
+
+---
+
+## 2. Technology Stack
+
+### Backend
+
+* NestJS
+* TypeScript
+* Mongoose
+* MongoDB
+* class-validator
+* class-transformer
+* @nestjs/config
+* Jest
+
+### Frontend
+
+* React
+* TypeScript
+* Vite
+
+---
+
+## 3. Repository Structure
+
+Primary repository areas:
+
+```text
+backend/
+frontend/
+docs/
+```
+
+Backend implementation is located under:
+
+```text
+backend/
+```
+
+Frontend implementation is located under:
+
+```text
+frontend/
+```
+
+Project requirements and architecture documentation are located under:
+
+```text
+docs/
+```
+
+---
+
+## 4. Important Documentation
+
+Before modifying relevant functionality, inspect the appropriate documents.
+
+### Business requirements
+
+```text
+docs/requirements.md
+```
+
+Defines what TaskFlow must do.
+
+### Acceptance criteria
+
+```text
+docs/acceptance-criteria.md
+```
+
+Defines how required behavior is verified.
+
+### API contract
+
+```text
+docs/api-contract.md
+```
+
+Defines communication between backend, frontend, and automated tests.
+
+### Architecture
+
+```text
+docs/architecture.md
+```
+
+Defines approved application architecture and engineering boundaries.
+
+---
+
+## 5. Source-of-Truth Rules
+
+Use the following precedence when implementation assumptions conflict:
+
+1. Explicit task instructions from the human orchestrator
+2. Approved API contract
+3. Approved requirements
+4. Approved architecture
+5. Existing implementation conventions
+
+If two approved documents appear to conflict:
+
+* do not guess
+* do not silently choose one
+* report the conflict
+* explain the impact
+* wait for human direction when the conflict affects behavior
+
+---
+
+## 6. Architecture Rules
+
+Approved backend flow:
+
+```text
+HTTP Request
+â†’ Controller
+â†’ DTO Validation
+â†’ Service
+â†’ Mongoose Model
+â†’ MongoDB
+```
+
+Approved frontend flow:
+
+```text
+React Components
+â†’ Task API Client
+â†’ REST API
+```
+
+Do not introduce unnecessary architectural layers.
+
+Do not introduce any of the following unless explicitly approved:
+
+* custom repository abstraction
+* CQRS
+* event sourcing
+* microservices
+* message queues
+* Redis
+* GraphQL
+* WebSockets
+* Redux
+* complex domain-driven design layers
+* unit-of-work abstraction
+
+Prefer the simplest implementation that satisfies the current requirements.
+
+---
+
+## 7. Backend Engineering Rules
+
+When modifying backend code:
+
+* follow NestJS module/controller/provider conventions
+* use dependency injection
+* keep controllers thin
+* place application behavior in services
+* use DTO classes for external input
+* use `class-validator` for request validation
+* use Mongoose through `@nestjs/mongoose`
+* use asynchronous APIs for I/O
+* validate MongoDB ObjectIds before database operations when required by the API contract
+* return correct HTTP status codes
+* preserve the public API contract
+* do not expose internal MongoDB implementation details unnecessarily
+* do not expose `_id` as the public task identifier
+* do not hardcode database connection strings
+* do not commit secrets
+
+---
+
+## 8. Validation Rules
+
+Backend validation is mandatory.
+
+Global NestJS validation should provide behavior equivalent to:
+
+```typescript
+new ValidationPipe({
+  whitelist: true,
+  forbidNonWhitelisted: true,
+  transform: true,
+})
+```
+
+Unsupported request properties must be rejected.
+
+Frontend validation may improve user experience but does not replace backend validation.
+
+---
+
+## 9. Mongoose Rules
+
+When working with MongoDB/Mongoose:
+
+* define schemas explicitly
+* use Mongoose timestamps for `createdAt` and `updatedAt`
+* constrain task status using the approved status values
+* avoid unnecessary `populate`
+* avoid unnecessary database queries
+* do not expose raw Mongoose/database errors to API clients
+* do not hardcode MongoDB credentials or connection strings
+
+Supported task statuses:
+
+```text
+Pending
+InProgress
+Completed
+```
+
+Do not introduce additional statuses without approved contract changes.
+
+---
+
+## 10. Frontend Engineering Rules
+
+When modifying frontend code:
+
+* use React function components
+* use TypeScript
+* use the public API contract defined in `docs/api-contract.md`
+* centralize API communication
+* do not duplicate backend URLs across components
+* use `VITE_API_BASE_URL` for backend configuration
+* maintain type-safe task models
+* handle loading states
+* handle API failures
+* provide an empty-state UI
+* keep components focused
+* do not introduce global state-management libraries unless explicitly approved
+
+Frontend components must use:
+
+```text
+id
+```
+
+and must not depend on MongoDB:
+
+```text
+_id
+```
+
+---
+
+## 11. API Contract Governance
+
+The API contract is defined by:
+
+```text
+docs/api-contract.md
+```
+
+Implementation agents must not silently change:
+
+* endpoint paths
+* HTTP methods
+* request fields
+* response fields
+* status values
+* error behavior
+* expected HTTP status codes
+
+If a contract change appears necessary:
+
+1. identify the conflicting requirement
+2. explain why the existing contract is insufficient
+3. describe the proposed change
+4. describe affected agents/components
+5. wait for human approval
+
+---
+
+## 12. Architecture Governance
+
+Implementation agents do not independently own architecture decisions.
+
+If the approved architecture prevents a required implementation:
+
+1. explain the current limitation
+2. propose the smallest architecture change
+3. explain consequences
+4. do not perform the architecture change without approval
+
+Do not describe unnecessary architectural additions as improvements merely because they are common patterns.
+
+---
+
+## 13. Agent Scope
+
+Agents should primarily modify only the scope assigned in their task.
+
+Typical ownership:
+
+### Backend Agent
+
+```text
+backend/**
+```
+
+### Frontend Agent
+
+```text
+frontend/**
+```
+
+### Testing Agent
+
+Testing-related files explicitly assigned by the orchestrator.
+
+### Reviewer Agent
+
+Read-only unless explicitly assigned fixes.
+
+Shared files such as:
+
+```text
+docs/api-contract.md
+docs/architecture.md
+AGENTS.md
+```
+
+must not be modified unless the task explicitly grants permission.
+
+---
+
+## 14. Scope Expansion Rule
+
+If completing a task appears to require changes outside assigned scope:
+
+Do not immediately modify the additional area.
+
+Instead:
+
+1. identify the required out-of-scope change
+2. explain why it is needed
+3. explain the likely impact
+4. request approval or report it as a blocker
+
+Small changes strictly required for compilation may be proposed, but should still be reported.
+
+---
+
+## 15. Before Coding
+
+Before making modifications:
+
+1. Read this `AGENTS.md`.
+2. Read documentation relevant to the task.
+3. Inspect the existing implementation.
+4. Identify affected files.
+5. Confirm the requested behavior.
+6. Determine the smallest appropriate implementation.
+
+Do not begin by rewriting large sections of the repository.
+
+---
+
+## 16. Implementation Principle
+
+Prefer:
+
+```text
+smallest correct change
+```
+
+over:
+
+```text
+largest comprehensive rewrite
+```
+
+Preserve existing working behavior unless requirements explicitly change it.
+
+Do not refactor unrelated code during feature implementation.
+
+---
+
+## 17. Verification
+
+An implementation is not complete simply because code was written.
+
+### Backend
+
+Run the appropriate commands from the backend project:
+
+```bash
+npm run build
+npm test
+```
+
+Run additional relevant tests when available.
+
+### Frontend
+
+Run the appropriate commands from the frontend project:
+
+```bash
+npm run build
+```
+
+Run frontend tests when such tests exist and are relevant.
+
+Agents must not state that a command passed unless the command was actually executed successfully.
+
+---
+
+## 18. Handling Test Failures
+
+If a test fails after an agent change:
+
+1. investigate the failure
+2. determine whether the implementation or test is incorrect
+3. do not automatically weaken or delete tests
+4. preserve documented behavior
+5. fix failures caused by the assigned change when possible
+6. report unresolved failures
+
+Never modify a correct contract test merely to make an incorrect implementation pass.
+
+---
+
+## 19. Error Handling
+
+Expected errors should be represented using appropriate NestJS HTTP exceptions or equivalent behavior.
+
+Do not expose:
+
+* stack traces
+* credentials
+* MongoDB connection strings
+* internal file-system paths
+* sensitive environment data
+
+to normal API clients.
+
+---
+
+## 20. Security Rules
+
+Agents must not:
+
+* commit secrets
+* hardcode credentials
+* disable validation to make tests pass
+* weaken security behavior without explicit approval
+* expose internal errors unnecessarily
+* execute destructive production commands
+* assume production access is available
+
+This repository should be treated as a development environment unless explicitly stated otherwise.
+
+---
+
+## 21. Git Rules
+
+Do not:
+
+* force-push branches
+* rewrite unrelated history
+* delete branches without instruction
+* commit unrelated changes
+* modify another agent's worktree
+* commit generated secrets or environment files
+
+Keep changes scoped and reviewable.
+
+When working in a dedicated agent branch/worktree, operate only within that assigned worktree.
+
+---
+
+## 22. Parallel Agent Rules
+
+When multiple agents are working concurrently:
+
+* respect assigned ownership boundaries
+* do not modify shared contracts unless explicitly authorized
+* do not assume another agent's unfinished implementation
+* rely on approved shared documentation for integration behavior
+* report dependencies or blockers
+* avoid touching files owned by another active agent
+
+Independent tasks may run in parallel.
+
+Dependent tasks must synchronize before integration.
+
+---
+
+## 23. Human-in-the-Loop Rule
+
+Agents may:
+
+* inspect code
+* propose solutions
+* modify assigned files
+* run approved development commands
+* execute tests/builds
+* review changes
+
+Agents do not have final authority to:
+
+* redefine requirements
+* change shared API contracts
+* redefine architecture
+* merge into the protected primary branch
+* deploy to production
+
+Final acceptance belongs to the human engineer/orchestrator.
+
+---
+
+## 24. Review Expectations
+
+Agent-generated changes should be reviewed for:
+
+* correctness
+* API contract compliance
+* architecture compliance
+* security
+* input validation
+* database behavior
+* performance
+* maintainability
+* unnecessary complexity
+* test quality
+* unrelated changes
+
+Passing tests alone does not prove a change is production-ready.
+
+---
+
+## 25. Completion Report
+
+At the end of an assigned implementation task, report:
+
+### Files changed
+
+List modified files.
+
+### Implementation summary
+
+Explain what was implemented.
+
+### Verification
+
+List commands actually executed.
+
+Example:
+
+```text
+npm run build â€” passed
+npm test â€” passed
+```
+
+### Assumptions
+
+List assumptions made during implementation.
+
+### Unresolved issues
+
+List blockers, failures, risks, or follow-up work.
+
+### Scope
+
+Confirm whether any files outside the assigned scope were modified.
+
+---
+
+## 26. Definition of Done for Agent Work
+
+Agent work is considered ready for human review when:
+
+1. Assigned functionality has been implemented.
+2. Relevant requirements have been followed.
+3. API contract has been preserved.
+4. Architecture has been preserved.
+5. Relevant build succeeds.
+6. Relevant tests pass or failures are clearly reported.
+7. No unnecessary scope expansion occurred.
+8. No secrets were introduced.
+9. Changed files are summarized.
+10. Assumptions and unresolved issues are reported.
+
+Human review and approval are still required before merge.
+
+# TaskFlow Requirements
+
+## 1. Project Purpose
+
+TaskFlow is a small task management application created to practice
+agentic software development, parallel AI agents, orchestration,
+worktree isolation, automated verification, and human-in-the-loop review.
+
+The application itself should remain intentionally simple.
+
+---
+
+## 2. Technology Stack
+
+### Backend
+- NestJS
+- TypeScript
+- Mongoose
+- MongoDB
+
+### Frontend
+- React
+- TypeScript
+- Vite
+
+### Testing
+- Jest
+- NestJS testing utilities
+
+---
+
+## 3. Functional Requirements
+
+### FR-01 Create Task
+
+A user must be able to create a task.
+
+A task contains:
+
+- id
+- title
+- description
+- status
+- createdAt
+- updatedAt
+
+Rules:
+
+- title is required
+- title must not contain only whitespace
+- title maximum length is 150 characters
+- description is optional
+- description maximum length is 1000 characters
+- status is optional when creating a task
+- default status is Pending
+
+---
+
+### FR-02 View All Tasks
+
+A user must be able to retrieve all tasks.
+
+Each returned task must contain:
+
+- id
+- title
+- description
+- status
+- createdAt
+- updatedAt
+
+The MongoDB `_id` field must not be exposed as the public API identifier.
+
+---
+
+### FR-03 View One Task
+
+A user must be able to retrieve a task by its id.
+
+If the id does not belong to an existing task:
+
+- return HTTP 404
+
+If the supplied id is not a valid MongoDB ObjectId:
+
+- return HTTP 400
+
+---
+
+### FR-04 Update Task
+
+A user must be able to update one or more of:
+
+- title
+- description
+- status
+
+Validation rules must also apply during updates.
+
+If the task does not exist:
+
+- return HTTP 404
+
+---
+
+### FR-05 Delete Task
+
+A user must be able to delete a task by id.
+
+If the task does not exist:
+
+- return HTTP 404
+
+After deletion, the task must no longer appear in task queries.
+
+---
+
+## 4. Task Statuses
+
+Supported statuses are:
+
+- Pending
+- InProgress
+- Completed
+
+No other status value is valid.
+
+---
+
+## 5. API Requirements
+
+The backend must provide:
+
+GET /api/tasks
+
+GET /api/tasks/:id
+
+POST /api/tasks
+
+PATCH /api/tasks/:id
+
+DELETE /api/tasks/:id
+
+---
+
+## 6. Frontend Requirements
+
+The frontend must provide:
+
+- task list
+- create task form
+- edit task capability
+- delete task capability
+- status update capability
+- loading state
+- error state
+- empty-state message when there are no tasks
+
+The frontend must interact with the backend through a dedicated API client module.
+
+API URLs must not be duplicated across components.
+
+---
+
+## 7. Validation Requirements
+
+Backend validation is mandatory.
+
+Frontend validation may improve usability but must never replace backend validation.
+
+Invalid input must not reach MongoDB persistence.
+
+---
+
+## 8. Error Handling Requirements
+
+Expected API behavior:
+
+### Invalid request
+HTTP 400
+
+### Task not found
+HTTP 404
+
+### Successful creation
+HTTP 201
+
+### Successful retrieval/update
+HTTP 200
+
+### Successful deletion
+HTTP 204
+
+Unexpected server errors should not expose stack traces or sensitive implementation details to API clients.
+
+---
+
+## 9. Persistence Requirements
+
+Task data must be persisted in MongoDB using Mongoose.
+
+Mongoose timestamps should be used for:
+
+- createdAt
+- updatedAt
+
+Database connection strings must come from environment configuration.
+
+No credentials or secrets may be committed to Git.
+
+---
+
+## 10. Non-Functional Requirements
+
+### Maintainability
+
+- Follow normal NestJS conventions.
+- Keep controllers thin.
+- Put application logic in services.
+- Avoid unnecessary architecture.
+
+### Security
+
+- Validate all external input.
+- Do not hardcode secrets.
+- Do not expose raw database errors unnecessarily.
+- Do not expose MongoDB implementation details unnecessarily.
+
+### Performance
+
+For the initial project:
+
+- avoid unnecessary database queries
+- avoid unnecessary Mongoose populate operations
+- do not load unrelated collections
+
+Advanced optimization is outside the initial project scope.
+
+### Testability
+
+Important backend behavior must be covered by automated tests.
+
+---
+
+## 11. Out of Scope
+
+The initial version will NOT include:
+
+- authentication
+- authorization
+- user accounts
+- role management
+- notifications
+- file uploads
+- WebSockets
+- microservices
+- queues
+- Redis
+- Redux
+- CQRS
+- event sourcing
+- production deployment
+
+These may be introduced later only when they support a specific
+agentic-development exercise.
+
+---
+
+## 12. Definition of Done
+
+A feature is considered complete only when:
+
+1. Requirements are satisfied.
+2. API contract is preserved.
+3. Relevant build succeeds.
+4. Relevant automated tests pass.
+5. No unrelated files are changed.
+6. Generated code has been reviewed.
+7. Known assumptions and limitations are documented.
+8. Human approval is given before merging.
+# TaskFlow Acceptance Criteria
+
+## AC-01 â€” Create a Valid Task
+
+### Given
+
+A valid request body:
+
+```json
+{
+  "title": "Learn Codex",
+  "description": "Practice agentic development"
+}
+```
+
+### When
+
+The client sends:
+
+```http
+POST /api/tasks
+```
+
+### Then
+
+* Response status must be `201 Created`.
+* A new task must be persisted in MongoDB.
+* The response must contain the created task.
+* The task must contain an `id`.
+* The task must contain `createdAt`.
+* The task must contain `updatedAt`.
+* If `status` is not provided, it must default to `Pending`.
+* The public response must expose `id`, not MongoDB `_id`.
+
+---
+
+## AC-02 â€” Create a Task with an Explicit Status
+
+### Given
+
+```json
+{
+  "title": "Build backend",
+  "description": "Implement the NestJS API",
+  "status": "InProgress"
+}
+```
+
+### When
+
+The client sends:
+
+```http
+POST /api/tasks
+```
+
+### Then
+
+* Response status must be `201 Created`.
+* The task must be persisted.
+* The returned status must be `InProgress`.
+
+---
+
+## AC-03 â€” Reject a Missing Title
+
+### Given
+
+```json
+{
+  "description": "Task without a title"
+}
+```
+
+### When
+
+The client sends:
+
+```http
+POST /api/tasks
+```
+
+### Then
+
+* Response status must be `400 Bad Request`.
+* No task must be persisted.
+
+---
+
+## AC-04 â€” Reject an Empty Title
+
+### Given
+
+```json
+{
+  "title": ""
+}
+```
+
+### When
+
+The client sends:
+
+```http
+POST /api/tasks
+```
+
+### Then
+
+* Response status must be `400 Bad Request`.
+* No task must be persisted.
+
+---
+
+## AC-05 â€” Reject a Whitespace-Only Title
+
+### Given
+
+```json
+{
+  "title": "   "
+}
+```
+
+### When
+
+The client sends:
+
+```http
+POST /api/tasks
+```
+
+### Then
+
+* Response status must be `400 Bad Request`.
+* No task must be persisted.
+
+---
+
+## AC-06 â€” Reject a Title Longer Than 150 Characters
+
+### Given
+
+A task title containing more than 150 characters.
+
+### When
+
+The client sends:
+
+```http
+POST /api/tasks
+```
+
+### Then
+
+* Response status must be `400 Bad Request`.
+* No task must be persisted.
+
+---
+
+## AC-07 â€” Accept a 150-Character Title
+
+### Given
+
+A task title containing exactly 150 characters.
+
+### When
+
+The client sends:
+
+```http
+POST /api/tasks
+```
+
+### Then
+
+* Response status must be `201 Created`.
+* The task must be persisted.
+
+---
+
+## AC-08 â€” Description Is Optional
+
+### Given
+
+```json
+{
+  "title": "Task without description"
+}
+```
+
+### When
+
+The client sends:
+
+```http
+POST /api/tasks
+```
+
+### Then
+
+* Response status must be `201 Created`.
+* The task must be persisted successfully.
+
+---
+
+## AC-09 â€” Reject a Description Longer Than 1000 Characters
+
+### Given
+
+A task description containing more than 1000 characters.
+
+### When
+
+The client sends:
+
+```http
+POST /api/tasks
+```
+
+### Then
+
+* Response status must be `400 Bad Request`.
+* No task must be persisted.
+
+---
+
+## AC-10 â€” Default Task Status
+
+### Given
+
+```json
+{
+  "title": "Learn agentic development"
+}
+```
+
+### When
+
+The task is created without a `status`.
+
+### Then
+
+The stored and returned task status must be:
+
+```text
+Pending
+```
+
+---
+
+## AC-11 â€” Accept Supported Status Values
+
+The API must accept these status values:
+
+```text
+Pending
+InProgress
+Completed
+```
+
+For each supported value:
+
+* Task creation must succeed.
+* Task update must succeed.
+* The stored value must match the requested value.
+
+---
+
+## AC-12 â€” Reject an Invalid Status
+
+### Given
+
+```json
+{
+  "title": "Invalid status test",
+  "status": "Started"
+}
+```
+
+### When
+
+The client sends:
+
+```http
+POST /api/tasks
+```
+
+### Then
+
+* Response status must be `400 Bad Request`.
+* No task must be persisted.
+
+---
+
+## AC-13 â€” Reject Unexpected Properties
+
+### Given
+
+```json
+{
+  "title": "Test",
+  "status": "Pending",
+  "isAdmin": true
+}
+```
+
+### When
+
+The client sends the request to an endpoint that accepts task input.
+
+### Then
+
+The backend must reject properties that are not part of the supported task input contract.
+
+Expected status:
+
+```text
+400 Bad Request
+```
+
+This assumes the NestJS validation configuration uses whitelist validation with unknown properties forbidden.
+
+---
+
+## AC-14 â€” Retrieve All Tasks
+
+### Given
+
+One or more tasks exist.
+
+### When
+
+The client sends:
+
+```http
+GET /api/tasks
+```
+
+### Then
+
+* Response status must be `200 OK`.
+* Response body must be an array.
+* Every task must follow the documented public task structure.
+
+Example:
+
+```json
+[
+  {
+    "id": "68abc123",
+    "title": "Learn Codex",
+    "description": "Practice agentic development",
+    "status": "Pending",
+    "createdAt": "2026-08-24T02:30:00.000Z",
+    "updatedAt": "2026-08-24T02:30:00.000Z"
+  }
+]
+```
+
+---
+
+## AC-15 â€” Retrieve Tasks When None Exist
+
+### Given
+
+There are no tasks in the database.
+
+### When
+
+The client sends:
+
+```http
+GET /api/tasks
+```
+
+### Then
+
+* Response status must be `200 OK`.
+* Response body must be:
+
+```json
+[]
+```
+
+An empty task collection must not result in `404`.
+
+---
+
+## AC-16 â€” Do Not Expose MongoDB `_id`
+
+### Given
+
+A task exists in MongoDB.
+
+### When
+
+The task is returned from any public API endpoint.
+
+### Then
+
+The public response must contain:
+
+```json
+{
+  "id": "..."
+}
+```
+
+and must not expose MongoDB's `_id` field as the public identifier.
+
+---
+
+## AC-17 â€” Retrieve One Existing Task
+
+### Given
+
+A task exists with a valid identifier.
+
+### When
+
+The client sends:
+
+```http
+GET /api/tasks/:id
+```
+
+### Then
+
+* Response status must be `200 OK`.
+* The correct task must be returned.
+* The returned `id` must match the requested task.
+* The response must follow the documented task response format.
+
+---
+
+## AC-18 â€” Reject an Invalid MongoDB ObjectId
+
+### Given
+
+An invalid identifier such as:
+
+```text
+not-a-valid-id
+```
+
+### When
+
+The client sends:
+
+```http
+GET /api/tasks/not-a-valid-id
+```
+
+### Then
+
+* Response status must be `400 Bad Request`.
+* The application must not expose an internal Mongoose stack trace or raw database error.
+
+---
+
+## AC-19 â€” Return 404 for a Missing Task
+
+### Given
+
+A syntactically valid MongoDB ObjectId that does not correspond to a task.
+
+### When
+
+The client sends:
+
+```http
+GET /api/tasks/:id
+```
+
+### Then
+
+Response status must be:
+
+```text
+404 Not Found
+```
+
+---
+
+## AC-20 â€” Update a Task Title
+
+### Given
+
+An existing task.
+
+### When
+
+The client sends:
+
+```http
+PATCH /api/tasks/:id
+```
+
+with:
+
+```json
+{
+  "title": "Updated task title"
+}
+```
+
+### Then
+
+* Response status must be `200 OK`.
+* The title must be updated.
+* Other task properties must remain unchanged unless explicitly supplied.
+* `updatedAt` must reflect the update.
+
+---
+
+## AC-21 â€” Update a Task Description
+
+### Given
+
+An existing task.
+
+### When
+
+The client sends:
+
+```http
+PATCH /api/tasks/:id
+```
+
+with:
+
+```json
+{
+  "description": "Updated task description"
+}
+```
+
+### Then
+
+* Response status must be `200 OK`.
+* The description must be updated.
+* Unspecified fields must remain unchanged.
+
+---
+
+## AC-22 â€” Update Task Status
+
+### Given
+
+An existing task with:
+
+```text
+Pending
+```
+
+### When
+
+The client sends:
+
+```http
+PATCH /api/tasks/:id
+```
+
+with:
+
+```json
+{
+  "status": "Completed"
+}
+```
+
+### Then
+
+* Response status must be `200 OK`.
+* The status must become `Completed`.
+* `updatedAt` must change.
+
+---
+
+## AC-23 â€” Support Partial Updates
+
+### Given
+
+An existing task.
+
+### When
+
+The client sends only one supported field:
+
+```json
+{
+  "status": "InProgress"
+}
+```
+
+### Then
+
+The API must not require:
+
+* title
+* description
+* other task fields
+
+A `PATCH` operation must support partial modification.
+
+---
+
+## AC-24 â€” Reject Invalid Status During Update
+
+### Given
+
+An existing task.
+
+### When
+
+The client sends:
+
+```json
+{
+  "status": "Finished"
+}
+```
+
+to:
+
+```http
+PATCH /api/tasks/:id
+```
+
+### Then
+
+* Response status must be `400 Bad Request`.
+* The existing task must not be changed.
+
+---
+
+## AC-25 â€” Reject an Empty Title During Update
+
+### Given
+
+An existing task.
+
+### When
+
+The client sends:
+
+```json
+{
+  "title": ""
+}
+```
+
+### Then
+
+* Response status must be `400 Bad Request`.
+* The existing title must remain unchanged.
+
+---
+
+## AC-26 â€” Reject a Whitespace-Only Title During Update
+
+### Given
+
+An existing task.
+
+### When
+
+The client sends:
+
+```json
+{
+  "title": "   "
+}
+```
+
+### Then
+
+* Response status must be `400 Bad Request`.
+* The existing task must remain unchanged.
+
+---
+
+## AC-27 â€” Reject an Oversized Description During Update
+
+### Given
+
+An existing task.
+
+### When
+
+A description containing more than 1000 characters is submitted.
+
+### Then
+
+* Response status must be `400 Bad Request`.
+* Existing persisted data must remain unchanged.
+
+---
+
+## AC-28 â€” Reject Invalid ObjectId During Update
+
+### When
+
+The client sends:
+
+```http
+PATCH /api/tasks/not-a-valid-id
+```
+
+### Then
+
+Response status must be:
+
+```text
+400 Bad Request
+```
+
+---
+
+## AC-29 â€” Return 404 When Updating a Missing Task
+
+### Given
+
+A valid MongoDB ObjectId that does not correspond to a task.
+
+### When
+
+The client sends:
+
+```http
+PATCH /api/tasks/:id
+```
+
+### Then
+
+Response status must be:
+
+```text
+404 Not Found
+```
+
+---
+
+## AC-30 â€” Delete an Existing Task
+
+### Given
+
+An existing task.
+
+### When
+
+The client sends:
+
+```http
+DELETE /api/tasks/:id
+```
+
+### Then
+
+* Response status must be `204 No Content`.
+* The task must be removed from MongoDB.
+* The response must not contain a task body.
+
+---
+
+## AC-31 â€” Deleted Task Must No Longer Be Returned
+
+### Given
+
+A task was successfully deleted.
+
+### When
+
+The client subsequently sends:
+
+```http
+GET /api/tasks/:id
+```
+
+### Then
+
+Response status must be:
+
+```text
+404 Not Found
+```
+
+The deleted task must also no longer appear in:
+
+```http
+GET /api/tasks
+```
+
+---
+
+## AC-32 â€” Reject Invalid ObjectId During Delete
+
+### When
+
+The client sends:
+
+```http
+DELETE /api/tasks/not-a-valid-id
+```
+
+### Then
+
+Response status must be:
+
+```text
+400 Bad Request
+```
+
+---
+
+## AC-33 â€” Return 404 When Deleting a Missing Task
+
+### Given
+
+A valid MongoDB ObjectId that does not correspond to an existing task.
+
+### When
+
+The client sends:
+
+```http
+DELETE /api/tasks/:id
+```
+
+### Then
+
+Response status must be:
+
+```text
+404 Not Found
+```
+
+---
+
+# Frontend Acceptance Criteria
+
+## AC-34 â€” Display Task List
+
+### Given
+
+Tasks are returned by the backend.
+
+### When
+
+The user opens TaskFlow.
+
+### Then
+
+The frontend must display the tasks.
+
+Each task should visibly provide at least:
+
+* title
+* description when available
+* status
+
+---
+
+## AC-35 â€” Display Empty State
+
+### Given
+
+The backend returns:
+
+```json
+[]
+```
+
+### When
+
+The task list loads.
+
+### Then
+
+The frontend must display a clear empty-state message rather than rendering an error.
+
+---
+
+## AC-36 â€” Display Loading State
+
+### Given
+
+A request to the API is currently pending.
+
+### Then
+
+The frontend must provide a visible loading state.
+
+---
+
+## AC-37 â€” Display API Error State
+
+### Given
+
+A task request fails.
+
+### Then
+
+The frontend must display a user-understandable error state.
+
+The UI must not expose raw server stack traces.
+
+---
+
+## AC-38 â€” Create Task from Frontend
+
+### Given
+
+The user enters valid task information.
+
+### When
+
+The user submits the create-task form.
+
+### Then
+
+* The frontend must send the correct `POST /api/tasks` request.
+* The created task must appear in the UI after successful creation.
+* The user must receive appropriate feedback if creation fails.
+
+---
+
+## AC-39 â€” Frontend Must Prevent Obviously Invalid Task Creation
+
+### Given
+
+The task title is missing or empty.
+
+### When
+
+The user attempts to submit the create form.
+
+### Then
+
+The frontend should prevent submission and show an appropriate validation message.
+
+Backend validation remains mandatory regardless of frontend validation.
+
+---
+
+## AC-40 â€” Edit Task from Frontend
+
+### Given
+
+A task exists.
+
+### When
+
+The user edits its supported fields.
+
+### Then
+
+* The frontend must send the appropriate `PATCH /api/tasks/:id` request.
+* The updated values must appear after a successful response.
+
+---
+
+## AC-41 â€” Change Status from Frontend
+
+The user must be able to change a task between:
+
+```text
+Pending
+InProgress
+Completed
+```
+
+After a successful backend response, the new status must be reflected in the UI.
+
+---
+
+## AC-42 â€” Delete Task from Frontend
+
+### Given
+
+A task exists.
+
+### When
+
+The user chooses to delete it.
+
+### Then
+
+* The frontend must call `DELETE /api/tasks/:id`.
+* After successful deletion, the task must disappear from the displayed list.
+* An API failure must not silently remove the task from the UI.
+
+---
+
+## AC-43 â€” Centralized API Communication
+
+Frontend components must not duplicate backend URLs throughout the codebase.
+
+API communication must be handled through a dedicated API module such as:
+
+```text
+src/api/tasksApi.ts
+```
+
+---
+
+## AC-44 â€” Type-Safe Task Contract
+
+The React application must define a TypeScript representation of a task containing:
+
+```text
+id
+title
+description
+status
+createdAt
+updatedAt
+```
+
+Supported task status values must be type-safe.
+
+---
+
+# Persistence and Configuration Acceptance Criteria
+
+## AC-45 â€” MongoDB Persistence
+
+Tasks created through the API must be persisted in MongoDB through Mongoose.
+
+Application restart must not remove successfully persisted tasks.
+
+---
+
+## AC-46 â€” Mongoose Timestamps
+
+Task documents must use Mongoose-managed timestamps.
+
+The application must expose:
+
+```text
+createdAt
+updatedAt
+```
+
+---
+
+## AC-47 â€” Environment-Based Database Configuration
+
+The MongoDB connection string must be obtained from environment configuration.
+
+It must not be hardcoded into application source code.
+
+Example development variable:
+
+```env
+MONGODB_URI=mongodb://localhost:27017/taskflow
+```
+
+---
+
+## AC-48 â€” Secrets Must Not Be Committed
+
+Files containing real secrets or environment-specific credentials must not be committed to Git.
+
+The project may provide:
+
+```text
+.env.example
+```
+
+with safe placeholder/example configuration.
+
+---
+
+# Engineering Acceptance Criteria
+
+## AC-49 â€” NestJS Responsibility Separation
+
+The backend should follow the normal flow:
+
+```text
+Request
+   â†“
+Controller
+   â†“
+DTO validation
+   â†“
+Service
+   â†“
+Mongoose Model
+   â†“
+MongoDB
+```
+
+Controllers should not directly contain database persistence logic.
+
+---
+
+## AC-50 â€” DTO Validation
+
+External create/update input must be represented by DTOs and validated using NestJS-compatible validation.
+
+The backend must not rely only on frontend validation.
+
+---
+
+## AC-51 â€” Global Validation
+
+NestJS must apply validation consistently to incoming requests.
+
+The validation configuration should:
+
+* transform input where appropriate
+* whitelist known properties
+* reject unsupported properties
+
+---
+
+## AC-52 â€” No Unnecessary Architecture
+
+The initial implementation must not introduce unnecessary infrastructure such as:
+
+* CQRS
+* event sourcing
+* microservices
+* Redis
+* message queues
+* repository abstraction solely for abstraction's sake
+
+unless the project requirements are explicitly changed.
+
+---
+
+## AC-53 â€” Backend Build Verification
+
+After backend implementation changes:
+
+```bash
+npm run build
+```
+
+must complete successfully.
+
+---
+
+## AC-54 â€” Backend Automated Tests
+
+Relevant automated tests must pass:
+
+```bash
+npm test
+```
+
+An agent must not claim tests passed unless it actually executed the test command.
+
+---
+
+## AC-55 â€” Frontend Build Verification
+
+After frontend implementation changes:
+
+```bash
+npm run build
+```
+
+must complete successfully.
+
+---
+
+## AC-56 â€” No Unrelated Agent Changes
+
+An agent assigned to a specific project area must not unnecessarily modify unrelated areas.
+
+Examples:
+
+Backend Agent:
+
+```text
+backend/**
+```
+
+should not modify frontend implementation without explicit authorization.
+
+Frontend Agent:
+
+```text
+frontend/**
+```
+
+should not modify backend behavior to solve a frontend problem.
+
+---
+
+## AC-57 â€” API Contract Must Not Be Changed Silently
+
+If implementation conflicts with the agreed API contract, an agent must report the conflict.
+
+The agent must not silently alter:
+
+* endpoint paths
+* status values
+* request structures
+* response structures
+* expected status codes
+
+simply because another implementation seems easier.
+
+---
+
+## AC-58 â€” Human Review Before Merge
+
+Agent-generated implementation must be reviewed before it is merged into the primary branch.
+
+Successful compilation or passing tests alone are not sufficient approval.
+
+Human review should consider:
+
+* correctness
+* maintainability
+* security
+* data integrity
+* architecture
+* unnecessary changes
+* quality of tests
+
+---
+
+# Definition of Done
+
+A TaskFlow feature is considered complete only when all applicable conditions below are satisfied:
+
+1. The relevant functional requirement is implemented.
+2. Applicable acceptance criteria pass.
+3. API behavior follows the agreed contract.
+4. Backend input validation is present where required.
+5. Relevant build commands succeed.
+6. Relevant automated tests succeed.
+7. No unrelated files were modified.
+8. No secrets were introduced.
+9. Agent-generated code has been reviewed.
+10. Known assumptions and limitations have been reported.
+11. Review findings classified as blocking have been resolved.
+12. A human engineer approves the change before merge.
+
+# TaskFlow API Contract
+
+## 1. Purpose
+
+This document defines the public REST API contract between the TaskFlow backend, frontend, automated tests, and AI development agents.
+
+It is the source of truth for API behavior.
+
+All agents working on API-related functionality must read this document before implementation.
+
+Agents must not silently change this contract.
+
+If an implementation requirement conflicts with this contract, the conflict must be reported for human review.
+
+---
+
+# 2. Base API
+
+Development backend URL:
+
+```text
+http://localhost:3000
+```
+
+All TaskFlow task endpoints use the following base path:
+
+```text
+/api/tasks
+```
+
+Example:
+
+```http
+GET http://localhost:3000/api/tasks
+```
+
+The frontend must not hardcode this complete URL throughout multiple components.
+
+The API base URL must be managed through centralized configuration.
+
+---
+
+# 3. Content Type
+
+Requests containing JSON must use:
+
+```http
+Content-Type: application/json
+```
+
+Successful API responses containing data must use JSON.
+
+---
+
+# 4. Task Resource
+
+The public Task resource has the following structure:
+
+```json
+{
+  "id": "68abc1234567890123456789",
+  "title": "Learn Codex orchestration",
+  "description": "Practice parallel agent development",
+  "status": "InProgress",
+  "createdAt": "2026-08-24T02:30:00.000Z",
+  "updatedAt": "2026-08-24T03:10:00.000Z"
+}
+```
+
+## Fields
+
+### id
+
+Type:
+
+```text
+string
+```
+
+Description:
+
+Public identifier for the task.
+
+The backend uses MongoDB ObjectIds internally but exposes the identifier as:
+
+```text
+id
+```
+
+The public API must not expose MongoDB `_id` as the API identifier.
+
+---
+
+### title
+
+Type:
+
+```text
+string
+```
+
+Required when creating a task.
+
+Rules:
+
+```text
+minimum meaningful length: 1 character
+maximum length: 150 characters
+must not contain only whitespace
+```
+
+---
+
+### description
+
+Type:
+
+```text
+string
+```
+
+Optional.
+
+Maximum length:
+
+```text
+1000 characters
+```
+
+---
+
+### status
+
+Allowed values:
+
+```text
+Pending
+InProgress
+Completed
+```
+
+Default value when creating a task:
+
+```text
+Pending
+```
+
+---
+
+### createdAt
+
+Type:
+
+```text
+ISO 8601 datetime string
+```
+
+Generated by the backend.
+
+Example:
+
+```text
+2026-08-24T02:30:00.000Z
+```
+
+Clients must not provide this field when creating a task.
+
+---
+
+### updatedAt
+
+Type:
+
+```text
+ISO 8601 datetime string
+```
+
+Generated and maintained by the backend.
+
+Clients must not provide this field when creating or updating a task.
+
+---
+
+# 5. Create Task
+
+## Endpoint
+
+```http
+POST /api/tasks
+```
+
+## Purpose
+
+Create a new task.
+
+---
+
+## Request Body
+
+```json
+{
+  "title": "Learn agentic development",
+  "description": "Practice Codex workflows",
+  "status": "Pending"
+}
+```
+
+### Required fields
+
+```text
+title
+```
+
+### Optional fields
+
+```text
+description
+status
+```
+
+If `status` is omitted:
+
+```text
+Pending
+```
+
+must be used.
+
+---
+
+## Successful Response
+
+HTTP:
+
+```text
+201 Created
+```
+
+Body:
+
+```json
+{
+  "id": "68abc1234567890123456789",
+  "title": "Learn agentic development",
+  "description": "Practice Codex workflows",
+  "status": "Pending",
+  "createdAt": "2026-08-24T02:30:00.000Z",
+  "updatedAt": "2026-08-24T02:30:00.000Z"
+}
+```
+
+---
+
+## Validation Errors
+
+The following must produce:
+
+```text
+400 Bad Request
+```
+
+Examples:
+
+* missing title
+* empty title
+* whitespace-only title
+* title longer than 150 characters
+* description longer than 1000 characters
+* unsupported status
+* unsupported request properties
+
+---
+
+# 6. Retrieve All Tasks
+
+## Endpoint
+
+```http
+GET /api/tasks
+```
+
+## Successful Response
+
+HTTP:
+
+```text
+200 OK
+```
+
+Body:
+
+```json
+[
+  {
+    "id": "68abc1234567890123456789",
+    "title": "Learn Codex",
+    "description": "Practice agent orchestration",
+    "status": "Pending",
+    "createdAt": "2026-08-24T02:30:00.000Z",
+    "updatedAt": "2026-08-24T02:30:00.000Z"
+  },
+  {
+    "id": "68def1234567890123456789",
+    "title": "Build frontend",
+    "description": "Implement React task UI",
+    "status": "InProgress",
+    "createdAt": "2026-08-24T02:40:00.000Z",
+    "updatedAt": "2026-08-24T03:00:00.000Z"
+  }
+]
+```
+
+---
+
+## Empty Collection
+
+If no tasks exist:
+
+HTTP:
+
+```text
+200 OK
+```
+
+Body:
+
+```json
+[]
+```
+
+An empty collection must not return:
+
+```text
+404 Not Found
+```
+
+---
+
+# 7. Retrieve Task by ID
+
+## Endpoint
+
+```http
+GET /api/tasks/:id
+```
+
+Example:
+
+```http
+GET /api/tasks/68abc1234567890123456789
+```
+
+---
+
+## Successful Response
+
+HTTP:
+
+```text
+200 OK
+```
+
+Body:
+
+```json
+{
+  "id": "68abc1234567890123456789",
+  "title": "Learn Codex",
+  "description": "Practice agentic development",
+  "status": "Pending",
+  "createdAt": "2026-08-24T02:30:00.000Z",
+  "updatedAt": "2026-08-24T02:30:00.000Z"
+}
+```
+
+---
+
+## Invalid ObjectId
+
+Example:
+
+```http
+GET /api/tasks/not-a-valid-id
+```
+
+Response:
+
+```text
+400 Bad Request
+```
+
+---
+
+## Task Not Found
+
+If the supplied ID is syntactically valid but does not correspond to an existing task:
+
+```text
+404 Not Found
+```
+
+---
+
+# 8. Update Task
+
+## Endpoint
+
+```http
+PATCH /api/tasks/:id
+```
+
+PATCH is used because TaskFlow supports partial updates.
+
+Clients do not need to send the complete Task object.
+
+---
+
+## Supported Update Fields
+
+The following fields may be updated:
+
+```text
+title
+description
+status
+```
+
+The following fields must not be client-controlled:
+
+```text
+id
+createdAt
+updatedAt
+_id
+```
+
+---
+
+## Example â€” Update Title
+
+Request:
+
+```http
+PATCH /api/tasks/68abc1234567890123456789
+```
+
+Body:
+
+```json
+{
+  "title": "Updated task title"
+}
+```
+
+Successful response:
+
+```text
+200 OK
+```
+
+Body:
+
+```json
+{
+  "id": "68abc1234567890123456789",
+  "title": "Updated task title",
+  "description": "Practice agentic development",
+  "status": "Pending",
+  "createdAt": "2026-08-24T02:30:00.000Z",
+  "updatedAt": "2026-08-24T04:00:00.000Z"
+}
+```
+
+---
+
+## Example â€” Update Status
+
+Request:
+
+```json
+{
+  "status": "Completed"
+}
+```
+
+Successful response:
+
+```text
+200 OK
+```
+
+The returned Task must contain:
+
+```json
+{
+  "status": "Completed"
+}
+```
+
+---
+
+## Example â€” Update Multiple Fields
+
+```json
+{
+  "title": "Complete Codex exercise",
+  "description": "Finish orchestration practice",
+  "status": "InProgress"
+}
+```
+
+---
+
+## Invalid Input
+
+Invalid update data must return:
+
+```text
+400 Bad Request
+```
+
+Examples:
+
+```json
+{
+  "title": ""
+}
+```
+
+```json
+{
+  "title": "   "
+}
+```
+
+```json
+{
+  "status": "Finished"
+}
+```
+
+---
+
+## Invalid ObjectId
+
+```http
+PATCH /api/tasks/not-a-valid-id
+```
+
+Response:
+
+```text
+400 Bad Request
+```
+
+---
+
+## Task Not Found
+
+If the supplied ObjectId is valid but no task exists:
+
+```text
+404 Not Found
+```
+
+---
+
+# 9. Delete Task
+
+## Endpoint
+
+```http
+DELETE /api/tasks/:id
+```
+
+Example:
+
+```http
+DELETE /api/tasks/68abc1234567890123456789
+```
+
+---
+
+## Successful Response
+
+```text
+204 No Content
+```
+
+The response body must be empty.
+
+After deletion:
+
+```http
+GET /api/tasks/:id
+```
+
+must return:
+
+```text
+404 Not Found
+```
+
+The deleted task must also no longer appear in:
+
+```http
+GET /api/tasks
+```
+
+---
+
+## Invalid ObjectId
+
+```http
+DELETE /api/tasks/not-a-valid-id
+```
+
+Response:
+
+```text
+400 Bad Request
+```
+
+---
+
+## Task Not Found
+
+If the ID is valid but the task does not exist:
+
+```text
+404 Not Found
+```
+
+---
+
+# 10. Error Response Contract
+
+TaskFlow should use a consistent error structure.
+
+NestJS may provide additional standard fields, but the API must expose at least useful HTTP status and message information.
+
+Example validation response:
+
+```json
+{
+  "statusCode": 400,
+  "message": [
+    "title should not be empty"
+  ],
+  "error": "Bad Request"
+}
+```
+
+Example not-found response:
+
+```json
+{
+  "statusCode": 404,
+  "message": "Task not found",
+  "error": "Not Found"
+}
+```
+
+Clients must not receive:
+
+* stack traces
+* MongoDB connection strings
+* credentials
+* internal server paths
+* raw database implementation details
+
+---
+
+# 11. Unknown Request Properties
+
+The backend must reject unsupported input properties.
+
+Example:
+
+```json
+{
+  "title": "Test",
+  "status": "Pending",
+  "isAdmin": true
+}
+```
+
+Expected:
+
+```text
+400 Bad Request
+```
+
+NestJS validation should therefore use behavior equivalent to:
+
+```typescript
+new ValidationPipe({
+  whitelist: true,
+  forbidNonWhitelisted: true,
+  transform: true,
+})
+```
+
+The exact implementation may vary, but the external behavior must match this contract.
+
+---
+
+# 12. Public ID Mapping
+
+MongoDB documents internally use:
+
+```text
+_id
+```
+
+The public TaskFlow API uses:
+
+```text
+id
+```
+
+Example internal representation:
+
+```json
+{
+  "_id": "68abc1234567890123456789"
+}
+```
+
+Public representation:
+
+```json
+{
+  "id": "68abc1234567890123456789"
+}
+```
+
+The API must not require the React frontend to understand MongoDB-specific identifier behavior.
+
+---
+
+# 13. Task Status Contract
+
+The only supported values are:
+
+```text
+Pending
+InProgress
+Completed
+```
+
+These values are case-sensitive.
+
+Valid:
+
+```json
+{
+  "status": "InProgress"
+}
+```
+
+Invalid examples:
+
+```text
+inprogress
+IN_PROGRESS
+Started
+Finished
+Done
+Complete
+```
+
+Agents must not introduce additional task statuses without updating this contract and receiving human approval.
+
+---
+
+# 14. Backend Environment Contract
+
+The NestJS application must obtain the MongoDB connection from:
+
+```text
+MONGODB_URI
+```
+
+Example local development configuration:
+
+```env
+MONGODB_URI=mongodb://localhost:27017/taskflow
+```
+
+A safe example configuration may be committed as:
+
+```text
+.env.example
+```
+
+Real environment secrets must not be committed.
+
+---
+
+# 15. Frontend Environment Contract
+
+The React application should obtain the backend URL from a Vite environment variable.
+
+Recommended variable:
+
+```text
+VITE_API_BASE_URL
+```
+
+Example local configuration:
+
+```env
+VITE_API_BASE_URL=http://localhost:3000
+```
+
+The frontend API client may then construct:
+
+```text
+${VITE_API_BASE_URL}/api/tasks
+```
+
+The backend URL must not be duplicated across multiple React components.
+
+---
+
+# 16. Frontend Task Type
+
+The frontend TypeScript representation should correspond to the public API.
+
+Example:
+
+```typescript
+export type TaskStatus =
+  | 'Pending'
+  | 'InProgress'
+  | 'Completed';
+
+export interface Task {
+  id: string;
+  title: string;
+  description?: string;
+  status: TaskStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+```
+
+The frontend must use:
+
+```text
+id
+```
+
+not:
+
+```text
+_id
+```
+
+---
+
+# 17. Create Task Input
+
+The frontend/backend contract for creation is:
+
+```typescript
+export interface CreateTaskInput {
+  title: string;
+  description?: string;
+  status?: TaskStatus;
+}
+```
+
+The frontend must not submit:
+
+```text
+id
+createdAt
+updatedAt
+_id
+```
+
+---
+
+# 18. Update Task Input
+
+The update contract is:
+
+```typescript
+export interface UpdateTaskInput {
+  title?: string;
+  description?: string;
+  status?: TaskStatus;
+}
+```
+
+PATCH requests must support partial updates.
+
+---
+
+# 19. API Summary
+
+| Method | Endpoint         | Purpose            | Success |
+| ------ | ---------------- | ------------------ | ------- |
+| GET    | `/api/tasks`     | Retrieve all tasks | `200`   |
+| GET    | `/api/tasks/:id` | Retrieve one task  | `200`   |
+| POST   | `/api/tasks`     | Create task        | `201`   |
+| PATCH  | `/api/tasks/:id` | Update task        | `200`   |
+| DELETE | `/api/tasks/:id` | Delete task        | `204`   |
+
+Common errors:
+
+| Situation                      | Status |
+| ------------------------------ | -----: |
+| Invalid request                |  `400` |
+| Invalid ObjectId               |  `400` |
+| Task not found                 |  `404` |
+| Unexpected application failure |  `500` |
+
+---
+
+# 20. Contract Ownership
+
+This document is jointly consumed by:
+
+```text
+Backend Agent
+Frontend Agent
+Testing Agent
+Reviewer Agent
+Human Engineer
+```
+
+No implementation agent owns the API contract.
+
+Contract changes require explicit human approval.
+
+For example, Backend Agent must not decide:
+
+```text
+PATCH is inconvenient.
+I will change it to PUT.
+```
+
+Frontend Agent must not decide:
+
+```text
+I prefer "Done" instead of "Completed".
+```
+
+Testing Agent must not change expectations merely because production code behaves differently.
+
+The agreed contract remains the source of truth.
+
+---
+
+# 21. Agent Conflict Rule
+
+If an agent discovers that implementing its assigned task would require changing this contract, it must:
+
+1. Stop changing the affected contract behavior.
+2. Report the conflict.
+3. Explain why the change appears necessary.
+4. Suggest a contract modification if appropriate.
+5. Wait for human approval before changing the contract.
+
+This prevents one parallel agent from silently breaking the work of other agents.
+
+---
+
+# 22. Definition of API Compatibility
+
+An implementation is API-compatible when:
+
+* endpoint paths match this document
+* HTTP methods match
+* request structures match
+* response structures match
+* status values match
+* validation behavior matches
+* expected HTTP status codes match
+* public identifiers use `id`
+* unsupported properties are rejected
+
+Passing compilation alone does not prove API compatibility.
+
+Automated tests and human review must verify the contract.
+
+# TaskFlow Architecture
+
+## 1. Purpose
+
+This document defines the approved application architecture for TaskFlow.
+
+Implementation agents must follow this architecture unless an architecture
+change has explicitly been approved.
+
+TaskFlow intentionally uses a simple architecture because the primary
+learning objective is agentic software development and orchestration.
+
+---
+
+## 2. Technology Stack
+
+### Backend
+
+- NestJS
+- TypeScript
+- Mongoose
+- MongoDB
+- class-validator
+- class-transformer
+- @nestjs/config
+
+### Frontend
+
+- React
+- TypeScript
+- Vite
+
+### Testing
+
+- Jest
+- NestJS testing utilities
+
+---
+
+## 3. System Architecture
+
+TaskFlow uses a client-server architecture.
+
+Flow:
+
+React Application
+â†’ REST API
+â†’ NestJS
+â†’ Mongoose
+â†’ MongoDB
+
+The frontend communicates with the backend using JSON over HTTP.
+
+The frontend must not communicate directly with MongoDB.
+
+---
+
+## 4. Backend Architecture
+
+Backend request flow:
+
+HTTP Request
+â†’ NestJS Controller
+â†’ DTO Validation
+â†’ Service
+â†’ Mongoose Model
+â†’ MongoDB
+
+### Controller
+
+Controllers are responsible for:
+
+- defining routes
+- reading request parameters
+- accepting validated DTOs
+- returning HTTP responses
+- delegating application behavior to services
+
+Controllers must remain thin.
+
+Controllers should not contain direct MongoDB persistence logic.
+
+### DTO
+
+DTOs define and validate external input.
+
+Create and update operations must use DTO validation.
+
+All external input must be considered untrusted.
+
+### Service
+
+Services contain task application behavior.
+
+The TasksService is responsible for:
+
+- creating tasks
+- retrieving tasks
+- updating tasks
+- deleting tasks
+- handling task-not-found behavior
+
+### Mongoose
+
+Mongoose provides MongoDB persistence.
+
+Task persistence is represented using an explicit Mongoose schema.
+
+Mongoose timestamps should provide:
+
+- createdAt
+- updatedAt
+
+The public API must expose `id`, not MongoDB `_id`.
+
+---
+
+## 5. Repository Pattern
+
+TaskFlow does not use a custom Repository layer in the initial architecture.
+
+Approved flow:
+
+Controller
+â†’ Service
+â†’ Mongoose Model
+
+A repository abstraction should not be introduced unless a demonstrated
+requirement justifies it and the architecture change receives approval.
+
+---
+
+## 6. Backend Module Structure
+
+Target structure:
+
+src/
+â”œâ”€â”€ config/
+â”œâ”€â”€ tasks/
+â”‚   â”œâ”€â”€ dto/
+â”‚   â”‚   â”œâ”€â”€ create-task.dto.ts
+â”‚   â”‚   â””â”€â”€ update-task.dto.ts
+â”‚   â”œâ”€â”€ schemas/
+â”‚   â”‚   â””â”€â”€ task.schema.ts
+â”‚   â”œâ”€â”€ task-status.enum.ts
+â”‚   â”œâ”€â”€ tasks.controller.ts
+â”‚   â”œâ”€â”€ tasks.service.ts
+â”‚   â””â”€â”€ tasks.module.ts
+â”œâ”€â”€ app.module.ts
+â””â”€â”€ main.ts
+
+Agents may make small structural adjustments when justified, but must
+preserve the approved responsibilities and boundaries.
+
+---
+
+## 7. Configuration
+
+Application configuration must come from environment variables.
+
+MongoDB configuration:
+
+MONGODB_URI
+
+Example:
+
+MONGODB_URI=mongodb://localhost:27017/taskflow
+
+Real secrets must not be committed.
+
+A safe `.env.example` may be committed.
+
+---
+
+## 8. Validation
+
+NestJS must apply global request validation.
+
+Required behavior:
+
+- whitelist supported input properties
+- reject unknown properties
+- transform request input where appropriate
+- reject invalid task status values
+- reject invalid title/description values
+
+Frontend validation may improve user experience but must never replace
+backend validation.
+
+---
+
+## 9. Frontend Architecture
+
+Frontend flow:
+
+React Components
+â†’ Task API Client
+â†’ REST API
+
+Target structure:
+
+src/
+â”œâ”€â”€ api/
+â”‚   â””â”€â”€ tasksApi.ts
+â”œâ”€â”€ components/
+â”‚   â”œâ”€â”€ TaskForm.tsx
+â”‚   â”œâ”€â”€ TaskList.tsx
+â”‚   â””â”€â”€ TaskCard.tsx
+â”œâ”€â”€ types/
+â”‚   â””â”€â”€ task.ts
+â”œâ”€â”€ App.tsx
+â””â”€â”€ main.tsx
+
+---
+
+## 10. API Client
+
+Backend API communication should be centralized.
+
+React components must not duplicate backend endpoint configuration.
+
+The API client should be responsible for operations such as:
+
+- getTasks
+- getTask
+- createTask
+- updateTask
+- deleteTask
+
+The backend base URL should come from:
+
+VITE_API_BASE_URL
+
+---
+
+## 11. Frontend State
+
+The initial application should use standard React state.
+
+A global state-management library is not required.
+
+Libraries such as Redux or Zustand should only be introduced if application
+complexity later demonstrates a real need.
+
+---
+
+## 12. Public API Contract
+
+The public API is defined by:
+
+docs/api-contract.md
+
+That document is the source of truth for:
+
+- endpoints
+- HTTP methods
+- request structures
+- response structures
+- task statuses
+- HTTP status codes
+
+Agents must not silently modify the API contract.
+
+---
+
+## 13. Architectural Constraints
+
+The initial TaskFlow architecture does not include:
+
+- microservices
+- CQRS
+- event sourcing
+- message queues
+- Redis
+- repository abstraction
+- unit-of-work abstraction
+- GraphQL
+- WebSockets
+- Redux
+- complex domain-driven-design layers
+
+Agents must not introduce these technologies simply as architectural
+"improvements."
+
+---
+
+## 14. Architecture Change Process
+
+If an agent believes an architectural change is required, it must:
+
+1. Identify the current architectural limitation.
+2. Explain why the requirement cannot reasonably be implemented within the
+   approved architecture.
+3. Propose the smallest appropriate architecture change.
+4. Describe its consequences.
+5. Wait for human approval.
+
+Implementation agents must not independently redefine the architecture.
+
+---
+
+## 15. Agent Ownership Boundaries
+
+Backend implementation agents normally own:
+
+backend/**
+
+Frontend implementation agents normally own:
+
+frontend/**
+
+Shared documentation such as:
+
+docs/api-contract.md
+docs/architecture.md
+
+is governed by the human orchestrator unless an agent is explicitly assigned
+a documentation task.
+
+---
+
+## 16. Verification
+
+Backend changes should normally be verified using:
+
+npm run build
+npm test
+
+Frontend changes should normally be verified using:
+
+npm run build
+
+Additional testing commands may be introduced later.
+
+An agent must not claim verification succeeded unless the relevant command
+was actually executed successfully.
+
+---
+
+## 17. Architectural Principle
+
+Prefer the simplest architecture that satisfies the current requirements.
+
+Architecture should solve demonstrated problems rather than anticipate every
+possible future requirement.
+Get-Content : Cannot find path 
+'D:\Projects\AI_AGENTIC_DEV_PROJECT\TaskFlow-agent-hard-001\docs\tasks\TASK-HARD-001.md' because it does not exist.
+At line:2 char:192
++ ... aw docs/architecture.md; Get-Content -Raw docs/tasks/TASK-HARD-001.md
++                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (D:\Projects\AI_...ASK-HARD-001.md:String) [Get-Content], ItemNotFoundEx 
+   ception
+    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.GetContentCommand
+ 
+
+codex
+The required task file is missing at `docs/tasks/TASK-HARD-001.md`, so the exact test specification is currently unavailable at the stated path. I’m checking the repository for a renamed/case-varied task brief and inspecting the backend/package scripts; I won’t infer scheduler behavior from the task title alone if no authoritative brief exists.
+exec
+"C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'rg --files docs backend/taskflow-api; git status --short; Get-ChildItem -Force backend/taskflow-api; Get-Content -Raw backend/taskflow-api/package.json; rg -n -i "scheduler|schedule|cron|hard-001|hardening" backend/taskflow-api docs' in D:\Projects\AI_AGENTIC_DEV_PROJECT\TaskFlow-agent-hard-001
+ succeeded in 395ms:
+docs\verification.md
+docs\tasks\TASK-004-review.md
+docs\tasks\TASK-003-backend-tests.md
+docs\tasks\TASK-002-frontend-ui.md
+docs\tasks\TASK-001-backend-crud.md
+docs\tasks\ORCHESTRATION-001-crud.md
+docs\tasks\EPIC-001-task-crud.md
+docs\reviews\REVIEW-001-task-crud.md
+docs\requirements.md
+docs\architecture.md
+docs\api-contract.md
+docs\acceptance-criteria.md
+backend/taskflow-api\tsconfig.json
+backend/taskflow-api\tsconfig.build.json
+backend/taskflow-api\test\tasks.e2e-spec.ts
+backend/taskflow-api\test\jest-e2e.json
+backend/taskflow-api\test\app.e2e-spec.ts
+backend/taskflow-api\src\tasks\tasks.service.ts
+backend/taskflow-api\src\tasks\tasks.service.spec.ts
+backend/taskflow-api\src\tasks\tasks.module.ts
+backend/taskflow-api\src\tasks\tasks.controller.ts
+backend/taskflow-api\src\tasks\task-status.enum.ts
+backend/taskflow-api\src\tasks\schemas\task.schema.ts
+backend/taskflow-api\src\tasks\schemas\task.schema.spec.ts
+backend/taskflow-api\src\tasks\dto\update-task.dto.ts
+backend/taskflow-api\src\tasks\dto\create-task.dto.ts
+backend/taskflow-api\src\main.ts
+backend/taskflow-api\src\app.service.ts
+backend/taskflow-api\src\app.module.ts
+backend/taskflow-api\src\app.controller.ts
+backend/taskflow-api\src\app.controller.spec.ts
+backend/taskflow-api\README.md
+backend/taskflow-api\package.json
+backend/taskflow-api\package-lock.json
+backend/taskflow-api\nest-cli.json
+backend/taskflow-api\eslint.config.mjs
+backend/taskflow-api\.env.example
+
+
+    Directory: D:\Projects\AI_AGENTIC_DEV_PROJECT\TaskFlow-agent-hard-001\backend\taskflow-api
+
+
+Mode                 LastWriteTime         Length Name                                                                 
+----                 -------------         ------ ----                                                                 
+d-----         8/27/2026   6:56 PM                src                                                                  
+d-----         8/27/2026   6:56 PM                test                                                                 
+-a----         8/27/2026   6:56 PM             59 .env.example                                                         
+-a----         8/27/2026   6:56 PM            742 .gitignore                                                           
+-a----         8/27/2026   6:56 PM             56 .prettierrc                                                          
+-a----         8/27/2026   6:56 PM            934 eslint.config.mjs                                                    
+-a----         8/27/2026   6:56 PM            179 nest-cli.json                                                        
+-a----         8/27/2026   6:56 PM         386822 package-lock.json                                                    
+-a----         8/27/2026   6:56 PM           2220 package.json                                                         
+-a----         8/27/2026   6:56 PM           5126 README.md                                                            
+-a----         8/27/2026   6:56 PM            101 tsconfig.build.json                                                  
+-a----         8/27/2026   6:56 PM            680 tsconfig.json                                                        
+{
+  "name": "taskflow-api",
+  "version": "0.0.1",
+  "description": "",
+  "author": "",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "nest build",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/main",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:e2e": "jest --config ./test/jest-e2e.json"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.1",
+    "@nestjs/config": "^4.0.4",
+    "@nestjs/core": "^11.0.1",
+    "@nestjs/mongoose": "^11.0.4",
+    "@nestjs/platform-express": "^11.0.1",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "mongoose": "^9.9.3",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "^9.18.0",
+    "@nestjs/cli": "^11.0.0",
+    "@nestjs/schematics": "^11.0.0",
+    "@nestjs/testing": "^11.0.1",
+    "@types/express": "^5.0.0",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.0.0",
+    "@types/supertest": "^7.0.0",
+    "eslint": "^9.18.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.2",
+    "globals": "^17.0.0",
+    "jest": "^30.0.0",
+    "prettier": "^3.4.2",
+    "source-map-support": "^0.5.21",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.5",
+    "ts-loader": "^9.5.2",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.20.0"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node"
+  }
+}
+
+docs\reviews\REVIEW-001-task-crud.md:71:  - CORS is enabled. It is unrestricted, but that is reasonable for this explicitly development-focused, unauthenticated exercise; production hardening remains out of scope.
+
+
+
+exec
+"C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -Command 'git branch --show-current; git log --oneline --decorate -12; git ls-tree -r --name-only HEAD docs/tasks; Get-Content -Raw backend/taskflow-api/src/tasks/tasks.service.spec.ts; Get-Content -Raw backend/taskflow-api/test/tasks.e2e-spec.ts; Get-Content -Raw backend/taskflow-api/test/app.e2e-spec.ts; Get-Content -Raw backend/taskflow-api/src/tasks/tasks.service.ts' in D:\Projects\AI_AGENTIC_DEV_PROJECT\TaskFlow-agent-hard-001
+ succeeded in 223ms:
+agent/task-hard-001
+bb0325d (HEAD -> agent/task-hard-001, origin/main, origin/HEAD, main) feat: stage 24 orchestration
+2c22ddf (agent/task-003-tests, agent/task-002-frontend-ui, agent/task-001-backend-crud) or chnage
+dfeddb2 orchestrator updated
+13511f8 feat: add lightweight agent orchestrator
+569ec71 reviews
+e3bb7ee chore: add integrated verification gate
+f4cbd08 chnages
+df83e68 frontend Chnages
+3677672 frontend Chnages
+3631a22 test: verify task CRUD API contract
+cc7e4ec test: add task API contract tests
+97b0ba1 test: add task API contract tests
+docs/tasks/EPIC-001-task-crud.md
+docs/tasks/ORCHESTRATION-001-crud.md
+docs/tasks/TASK-001-backend-crud.md
+docs/tasks/TASK-002-frontend-ui.md
+docs/tasks/TASK-003-backend-tests.md
+docs/tasks/TASK-004-review.md
+import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { Model, Types } from 'mongoose';
+import { TaskStatus } from './task-status.enum';
+import { Task, TaskDocument } from './schemas/task.schema';
+import { TasksService } from './tasks.service';
+
+describe('TasksService', () => {
+  let service: TasksService;
+  let taskModel: {
+    create: jest.Mock;
+    find: jest.Mock;
+    findById: jest.Mock;
+    findByIdAndUpdate: jest.Mock;
+    findByIdAndDelete: jest.Mock;
+  };
+
+  const task = { _id: new Types.ObjectId() } as TaskDocument;
+
+  beforeEach(() => {
+    taskModel = {
+      create: jest.fn(),
+      find: jest.fn(),
+      findById: jest.fn(),
+      findByIdAndUpdate: jest.fn(),
+      findByIdAndDelete: jest.fn(),
+    };
+    service = new TasksService(taskModel as unknown as Model<Task>);
+  });
+
+  it('creates a task', async () => {
+    taskModel.create.mockResolvedValue(task);
+
+    await expect(
+      service.create({ title: 'Build backend', status: TaskStatus.Pending }),
+    ).resolves.toBe(task);
+  });
+
+  it('returns all tasks', async () => {
+    taskModel.find.mockReturnValue({ exec: jest.fn().mockResolvedValue([task]) });
+
+    await expect(service.findAll()).resolves.toEqual([task]);
+  });
+
+  it('rejects an invalid ObjectId before querying MongoDB', async () => {
+    await expect(service.findOne('not-a-valid-id')).rejects.toBeInstanceOf(
+      BadRequestException,
+    );
+    expect(taskModel.findById).not.toHaveBeenCalled();
+  });
+
+  it('returns 404 when a task does not exist', async () => {
+    taskModel.findById.mockReturnValue({ exec: jest.fn().mockResolvedValue(null) });
+
+    await expect(
+      service.findOne(new Types.ObjectId().toString()),
+    ).rejects.toBeInstanceOf(NotFoundException);
+  });
+
+  it('updates only supplied fields and returns the updated task', async () => {
+    const exec = jest.fn().mockResolvedValue(task);
+    taskModel.findByIdAndUpdate.mockReturnValue({ exec });
+    const id = task._id.toString();
+    const update = { status: TaskStatus.Completed };
+
+    await expect(service.update(id, update)).resolves.toBe(task);
+    expect(taskModel.findByIdAndUpdate).toHaveBeenCalledWith(id, update, {
+      new: true,
+      runValidators: true,
+    });
+  });
+
+  it('deletes an existing task', async () => {
+    taskModel.findByIdAndDelete.mockReturnValue({
+      exec: jest.fn().mockResolvedValue(task),
+    });
+
+    await expect(service.remove(task._id.toString())).resolves.toBeUndefined();
+  });
+
+  it('returns 404 when deleting a missing task', async () => {
+    taskModel.findByIdAndDelete.mockReturnValue({
+      exec: jest.fn().mockResolvedValue(null),
+    });
+
+    await expect(
+      service.remove(new Types.ObjectId().toString()),
+    ).rejects.toBeInstanceOf(NotFoundException);
+  });
+});
+
+import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { getConnectionToken } from '@nestjs/mongoose';
+import { Test } from '@nestjs/testing';
+import { Connection, Types } from 'mongoose';
+import request from 'supertest';
+import { App } from 'supertest/types';
+
+type TaskStatus = 'Pending' | 'InProgress' | 'Completed';
+
+interface TaskResponse {
+  id: string;
+  title: string;
+  description?: string;
+  status: TaskStatus;
+  createdAt: string;
+  updatedAt: string;
+  _id?: unknown;
+  __v?: unknown;
+}
+
+describe('Tasks API contract (e2e)', () => {
+  let app: INestApplication<App>;
+  let connection: Connection;
+
+  beforeAll(async () => {
+    const mongoUri = process.env.TEST_MONGODB_URI ?? process.env.MONGODB_URI;
+
+    if (!mongoUri) {
+      throw new Error(
+        'Set TEST_MONGODB_URI (preferred) or MONGODB_URI to an isolated test database before running the Task API e2e suite.',
+      );
+    }
+
+    process.env.MONGODB_URI = mongoUri;
+    const { AppModule } = await import('../src/app.module');
+    const moduleFixture = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
+
+    app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
+    );
+    await app.init();
+    connection = app.get<Connection>(getConnectionToken());
+  });
+
+  beforeEach(async () => {
+    await connection.collection('tasks').deleteMany({});
+  });
+
+  afterAll(async () => {
+    if (app) {
+      await connection.collection('tasks').deleteMany({});
+      await app.close();
+    }
+  });
+
+  const api = () => request(app.getHttpServer());
+  const missingId = () => new Types.ObjectId().toHexString();
+
+  const expectPublicTask = (task: TaskResponse) => {
+    expect(task).toEqual(
+      expect.objectContaining({
+        id: expect.any(String),
+        title: expect.any(String),
+        status: expect.stringMatching(/^(Pending|InProgress|Completed)$/),
+        createdAt: expect.any(String),
+        updatedAt: expect.any(String),
+      }),
+    );
+    expect(task).not.toHaveProperty('_id');
+    expect(task).not.toHaveProperty('__v');
+    expect(Number.isNaN(Date.parse(task.createdAt))).toBe(false);
+    expect(Number.isNaN(Date.parse(task.updatedAt))).toBe(false);
+  };
+
+  const createTask = async (
+    overrides: Partial<{
+      title: string;
+      description: string;
+      status: TaskStatus;
+    }> = {},
+  ): Promise<TaskResponse> => {
+    const response = await api()
+      .post('/api/tasks')
+      .send({
+        title: 'Contract test task',
+        description: 'Created by the TaskFlow e2e suite',
+        ...overrides,
+      })
+      .expect(201);
+
+    return response.body as TaskResponse;
+  };
+
+  const expectSafeError = (body: unknown, statusCode: 400 | 404) => {
+    expect(body).toEqual(
+      expect.objectContaining({
+        statusCode,
+        message: expect.anything(),
+      }),
+    );
+    const serialized = JSON.stringify(body);
+    expect(serialized).not.toMatch(/stack|mongodb:\/\/|mongoose|CastError/i);
+  };
+
+  describe('POST /api/tasks', () => {
+    it('creates and persists a valid task with Pending as the default status', async () => {
+      const response = await api()
+        .post('/api/tasks')
+        .send({
+          title: 'Learn Codex',
+          description: 'Practice agentic development',
+        })
+        .expect(201);
+
+      const task = response.body as TaskResponse;
+      expectPublicTask(task);
+      expect(task).toEqual(
+        expect.objectContaining({
+          title: 'Learn Codex',
+          description: 'Practice agentic development',
+          status: 'Pending',
+        }),
+      );
+
+      const persisted = await api().get(`/api/tasks/${task.id}`).expect(200);
+      expect(persisted.body).toEqual(task);
+    });
+
+    it('creates a task with an explicit status', async () => {
+      const task = await createTask({ status: 'InProgress' });
+      expect(task.status).toBe('InProgress');
+      expect(
+        (await api().get(`/api/tasks/${task.id}`).expect(200)).body.status,
+      ).toBe('InProgress');
+    });
+
+    it.each<TaskStatus>(['Pending', 'InProgress', 'Completed'])(
+      'accepts the supported %s status',
+      async (status) => {
+        expect((await createTask({ status })).status).toBe(status);
+      },
+    );
+
+    it('accepts a 150-character title and an omitted description', async () => {
+      const response = await api()
+        .post('/api/tasks')
+        .send({ title: 't'.repeat(150) })
+        .expect(201);
+      expect(response.body.title).toHaveLength(150);
+    });
+
+    it.each([
+      ['a missing title', { description: 'Task without a title' }],
+      ['an empty title', { title: '' }],
+      ['a whitespace-only title', { title: '   ' }],
+      ['a title longer than 150 characters', { title: 't'.repeat(151) }],
+      [
+        'a description longer than 1000 characters',
+        { title: 'Test', description: 'd'.repeat(1001) },
+      ],
+      ['an invalid status', { title: 'Test', status: 'Started' }],
+      ['an unexpected property', { title: 'Test', isAdmin: true }],
+    ])('rejects %s without persisting a task', async (_case, body) => {
+      const response = await api().post('/api/tasks').send(body).expect(400);
+      expectSafeError(response.body, 400);
+      expect((await api().get('/api/tasks').expect(200)).body).toEqual([]);
+    });
+  });
+
+  describe('GET /api/tasks', () => {
+    it('returns all tasks using the public task structure', async () => {
+      const first = await createTask({ title: 'First task' });
+      const second = await createTask({
+        title: 'Second task',
+        status: 'Completed',
+      });
+
+      const response = await api().get('/api/tasks').expect(200);
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body).toHaveLength(2);
+      response.body.forEach(expectPublicTask);
+      expect(response.body.map((task: TaskResponse) => task.id)).toEqual(
+        expect.arrayContaining([first.id, second.id]),
+      );
+    });
+
+    it('returns an empty array when no tasks exist', async () => {
+      expect((await api().get('/api/tasks').expect(200)).body).toEqual([]);
+    });
+  });
+
+  describe('GET /api/tasks/:id', () => {
+    it('returns an existing task', async () => {
+      const created = await createTask({ title: 'Retrieve me' });
+      const response = await api().get(`/api/tasks/${created.id}`).expect(200);
+      expectPublicTask(response.body);
+      expect(response.body).toEqual(created);
+    });
+
+    it('returns 400 for an invalid ObjectId without exposing internals', async () => {
+      const response = await api().get('/api/tasks/not-a-valid-id').expect(400);
+      expectSafeError(response.body, 400);
+    });
+
+    it('returns 404 for a syntactically valid missing task id', async () => {
+      const response = await api().get(`/api/tasks/${missingId()}`).expect(404);
+      expectSafeError(response.body, 404);
+    });
+  });
+
+  describe('PATCH /api/tasks/:id', () => {
+    it('updates the title and preserves unspecified fields', async () => {
+      const created = await createTask({
+        title: 'Old title',
+        status: 'Pending',
+      });
+      const response = await api()
+        .patch(`/api/tasks/${created.id}`)
+        .send({ title: 'Updated task title' })
+        .expect(200);
+
+      expect(response.body).toEqual(
+        expect.objectContaining({
+          id: created.id,
+          title: 'Updated task title',
+          description: created.description,
+          status: created.status,
+          createdAt: created.createdAt,
+        }),
+      );
+      expect(Date.parse(response.body.updatedAt)).toBeGreaterThanOrEqual(
+        Date.parse(created.updatedAt),
+      );
+    });
+
+    it('updates the description and preserves unspecified fields', async () => {
+      const created = await createTask({ title: 'Keep title' });
+      const response = await api()
+        .patch(`/api/tasks/${created.id}`)
+        .send({ description: 'Updated task description' })
+        .expect(200);
+
+      expect(response.body).toEqual(
+        expect.objectContaining({
+          id: created.id,
+          title: created.title,
+          description: 'Updated task description',
+          status: created.status,
+        }),
+      );
+    });
+
+    it('updates the status and changes updatedAt', async () => {
+      const created = await createTask({ status: 'Pending' });
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      const response = await api()
+        .patch(`/api/tasks/${created.id}`)
+        .send({ status: 'Completed' })
+        .expect(200);
+
+      expect(response.body.status).toBe('Completed');
+      expect(Date.parse(response.body.updatedAt)).toBeGreaterThan(
+        Date.parse(created.updatedAt),
+      );
+    });
+
+    it('supports a partial update without requiring other task fields', async () => {
+      const created = await createTask({ title: 'Unchanged title' });
+      const response = await api()
+        .patch(`/api/tasks/${created.id}`)
+        .send({ status: 'InProgress' })
+        .expect(200);
+      expect(response.body.title).toBe(created.title);
+      expect(response.body.status).toBe('InProgress');
+    });
+
+    it.each([
+      ['an empty title', { title: '' }],
+      ['a whitespace-only title', { title: '   ' }],
+      ['a title longer than 150 characters', { title: 't'.repeat(151) }],
+      [
+        'a description longer than 1000 characters',
+        { description: 'd'.repeat(1001) },
+      ],
+      ['an invalid status', { status: 'Finished' }],
+      ['an unexpected property', { isAdmin: true }],
+    ])(
+      'rejects %s and leaves the existing task unchanged',
+      async (_case, body) => {
+        const created = await createTask({
+          title: 'Original title',
+          status: 'Pending',
+        });
+        const response = await api()
+          .patch(`/api/tasks/${created.id}`)
+          .send(body)
+          .expect(400);
+        expectSafeError(response.body, 400);
+        expect(
+          (await api().get(`/api/tasks/${created.id}`).expect(200)).body,
+        ).toEqual(created);
+      },
+    );
+
+    it('returns 400 for an invalid ObjectId', async () => {
+      const response = await api()
+        .patch('/api/tasks/not-a-valid-id')
+        .send({ title: 'Updated' })
+        .expect(400);
+      expectSafeError(response.body, 400);
+    });
+
+    it('returns 404 when updating a missing task', async () => {
+      const response = await api()
+        .patch(`/api/tasks/${missingId()}`)
+        .send({ title: 'Updated' })
+        .expect(404);
+      expectSafeError(response.body, 404);
+    });
+  });
+
+  describe('DELETE /api/tasks/:id', () => {
+    it('deletes an existing task with an empty 204 response', async () => {
+      const created = await createTask();
+      const response = await api()
+        .delete(`/api/tasks/${created.id}`)
+        .expect(204);
+      expect(response.text).toBe('');
+    });
+
+    it('returns 400 for an invalid ObjectId', async () => {
+      const response = await api()
+        .delete('/api/tasks/not-a-valid-id')
+        .expect(400);
+      expectSafeError(response.body, 400);
+    });
+
+    it('returns 404 when deleting a missing task', async () => {
+      const response = await api()
+        .delete(`/api/tasks/${missingId()}`)
+        .expect(404);
+      expectSafeError(response.body, 404);
+    });
+
+    it('does not return a deleted task from item or collection queries', async () => {
+      const deleted = await createTask({ title: 'Delete me' });
+      const retained = await createTask({ title: 'Keep me' });
+      await api().delete(`/api/tasks/${deleted.id}`).expect(204);
+
+      await api().get(`/api/tasks/${deleted.id}`).expect(404);
+      const collection = (await api().get('/api/tasks').expect(200))
+        .body as TaskResponse[];
+      expect(collection.map((task) => task.id)).toEqual([retained.id]);
+    });
+  });
+});
+
+import { Test, TestingModule } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
+import request from 'supertest';
+import { App } from 'supertest/types';
+import { AppModule } from './../src/app.module';
+
+describe('AppController (e2e)', () => {
+  let app: INestApplication<App>;
+
+  beforeEach(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
+
+    app = moduleFixture.createNestApplication();
+    await app.init();
+  });
+
+  it('/ (GET)', () => {
+    return request(app.getHttpServer())
+      .get('/')
+      .expect(200)
+      .expect('Hello World!');
+  });
+
+  afterEach(async () => {
+    if (app) {
+      await app.close();
+    }
+  });
+});
+
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose';
+import { CreateTaskDto } from './dto/create-task.dto';
+import { UpdateTaskDto } from './dto/update-task.dto';
+import { Task, TaskDocument } from './schemas/task.schema';
+
+@Injectable()
+export class TasksService {
+  constructor(
+    @InjectModel(Task.name) private readonly taskModel: Model<Task>,
+  ) {}
+
+  create(createTaskDto: CreateTaskDto): Promise<TaskDocument> {
+    return this.taskModel.create(createTaskDto);
+  }
+
+  findAll(): Promise<TaskDocument[]> {
+    return this.taskModel.find().exec();
+  }
+
+  async findOne(id: string): Promise<TaskDocument> {
+    this.validateObjectId(id);
+
+    const task = await this.taskModel.findById(id).exec();
+    return this.requireTask(task);
+  }
+
+  async update(
+    id: string,
+    updateTaskDto: UpdateTaskDto,
+  ): Promise<TaskDocument> {
+    this.validateObjectId(id);
+
+    const task = await this.taskModel
+      .findByIdAndUpdate(id, updateTaskDto, {
+        new: true,
+        runValidators: true,
+      })
+      .exec();
+    return this.requireTask(task);
+  }
+
+  async remove(id: string): Promise<void> {
+    this.validateObjectId(id);
+
+    const task = await this.taskModel.findByIdAndDelete(id).exec();
+    this.requireTask(task);
+  }
+
+  private validateObjectId(id: string): void {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('Invalid task id');
+    }
+  }
+
+  private requireTask(task: TaskDocument | null): TaskDocument {
+    if (!task) {
+      throw new NotFoundException('Task not found');
+    }
+
+    return task;
+  }
+}
+
+
+codex
+Blocked before implementation: `docs/tasks/TASK-HARD-001.md` does not exist in this worktree, and no scheduler-related code or task specification is present elsewhere in the repository. The task title alone is insufficient to infer the intended hardening test safely.
+
+- Files changed: none
+- Packages changed: none
+- Verification commands: none; implementation could not begin
+- Contract/architecture conflicts: none identified
+- Assumption: “No production changes required” means this is intended to be test-only
+- Blocker: missing authoritative `TASK-HARD-001` specification
+- Unresolved: required scheduler behavior, target test file, and expected assertions
+- Scope respected: yes; no files were modified
+- Git actions: no merge, branch deletion, or worktree deletion performed
+
+Please provide or restore `docs/tasks/TASK-HARD-001.md`, or paste its contents.
+tokens used
+26,128
+Blocked before implementation: `docs/tasks/TASK-HARD-001.md` does not exist in this worktree, and no scheduler-related code or task specification is present elsewhere in the repository. The task title alone is insufficient to infer the intended hardening test safely.
+
+- Files changed: none
+- Packages changed: none
+- Verification commands: none; implementation could not begin
+- Contract/architecture conflicts: none identified
+- Assumption: “No production changes required” means this is intended to be test-only
+- Blocker: missing authoritative `TASK-HARD-001` specification
+- Unresolved: required scheduler behavior, target test file, and expected assertions
+- Scope respected: yes; no files were modified
+- Git actions: no merge, branch deletion, or worktree deletion performed
+
+Please provide or restore `docs/tasks/TASK-HARD-001.md`, or paste its contents.
