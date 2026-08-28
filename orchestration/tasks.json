@@ -37,20 +37,30 @@
       "humanApprovalRequired": true
     },
     {
-    "id": "TASK-001",
-    "name": "Backend CRUD",
-    "owner": "backend-worker",
-    "verificationWorker": "verification-worker",
-    "dependencies": [],
-    "branch": "agent/task-001-backend-crud",
-    "worktreeName": "TaskFlow-agent-backend",
-    "scope": [
-      "backend/taskflow-api/**"
-    ],
-    "verification": [
-      "npm run build",
-      "npm test"
-    ]
+      "id": "TASK-STAGE33-TEST",
+      "name": "Stage 33 Orchestrator Test",
+      "owner": "backend-worker",
+      "verificationWorker": "verification-worker",
+      "dependencies": [],
+      "branch": "agent/stage33-test",
+      "worktreeName": "TaskFlow-agent-stage33-test",
+      "taskFile": "docs/tasks/TASK-STAGE33-TEST.md",
+      "scope": [
+        "backend/taskflow-api/**"
+      ],
+      "verificationWorkingDirectory": "backend/taskflow-api",
+      "verification": [
+        "npm run build"
+      ],
+      "verificationCommands": [
+        "npm run build"
+      ],
+      "commitMessage": "test: validate stage 33 orchestration",
+      "ciFixCommitMessage": "fix: resolve stage 33 CI test failure",
+      "pullRequest": {
+        "title": "TASK-STAGE33-TEST: Validate Stage 33 orchestration",
+        "base": "main"
+      }
     }
   ]
 }

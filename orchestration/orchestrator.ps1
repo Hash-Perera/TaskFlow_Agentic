@@ -81,7 +81,7 @@ function Initialize-RuntimeState($Tasks,$RuntimeState){
         if(-not $existing){
             $initial=if($task.PSObject.Properties.Name -contains "state"){[string]$task.state}elseif($task.dependencies -and @($task.dependencies).Count -gt 0){"BLOCKED"}else{"READY"}
             $st=[PSCustomObject]@{
-                state=$initial; approved=$false; approvedAt=$null; attempts=0; fixAttempts=0; ciFixAttempts=0; executionMode=$null;
+                state=$initial; blockKind=$(if($initial -eq "BLOCKED"){"DEPENDENCY"}else{$null}); approved=$false; approvedAt=$null; attempts=0; fixAttempts=0; ciFixAttempts=0; executionMode=$null;
                 lastExitCode=$null; startedAt=$null; completedAt=$null; processId=$null; processStartTime=$null;
                 lastFailureReason=$null; lastFixReason=$null; lastCiFailureReason=$null;
                 stdoutPath=$null; stderrPath=$null; exitCodePath=$null; worktreePath=$null;
@@ -99,7 +99,7 @@ function Initialize-RuntimeState($Tasks,$RuntimeState){
             $RuntimeState.tasks | Add-Member NoteProperty $id $st
         } else {
             $st=$existing.Value
-            $props=@{state="BACKLOG";approved=$false;approvedAt=$null;attempts=0;fixAttempts=0;ciFixAttempts=0;executionMode=$null;lastExitCode=$null;startedAt=$null;completedAt=$null;processId=$null;processStartTime=$null;lastFailureReason=$null;lastFixReason=$null;lastCiFailureReason=$null;stdoutPath=$null;stderrPath=$null;exitCodePath=$null;worktreePath=$null;agentResultPath=$null;verifierResultPath=$null;verificationResultPath=$null;commitSha=$null;remoteBranch=$null;pullRequestNumber=$null;pullRequestUrl=$null;ciState=$null;ciRunId=$null;lastCiCheckedAt=$null;ciFailureLogPath=$null;integrationSha=$null;integratedAt=$null;integrationVerifiedAt=$null;integrationVerificationExitCode=$null;rollbackSha=$null;rolledBackAt=$null}
+            $props=@{state="BACKLOG";blockKind=$null;approved=$false;approvedAt=$null;attempts=0;fixAttempts=0;ciFixAttempts=0;executionMode=$null;lastExitCode=$null;startedAt=$null;completedAt=$null;processId=$null;processStartTime=$null;lastFailureReason=$null;lastFixReason=$null;lastCiFailureReason=$null;stdoutPath=$null;stderrPath=$null;exitCodePath=$null;worktreePath=$null;agentResultPath=$null;verifierResultPath=$null;verificationResultPath=$null;commitSha=$null;remoteBranch=$null;pullRequestNumber=$null;pullRequestUrl=$null;ciState=$null;ciRunId=$null;lastCiCheckedAt=$null;ciFailureLogPath=$null;integrationSha=$null;integratedAt=$null;integrationVerifiedAt=$null;integrationVerificationExitCode=$null;rollbackSha=$null;rolledBackAt=$null}
             foreach($k in $props.Keys){Add-MissingProperty $st $k $props[$k]}
         }
     }
@@ -109,13 +109,41 @@ function Test-IsDependencyCompleteState([string]$State){$State -in @("DONE","MER
 function Test-DependenciesSatisfied($Task,$Tasks,$RuntimeState){
     foreach($depId in @($Task.dependencies)){ $dep=Get-TaskById $depId $Tasks; if(-not $dep){throw "Missing dependency '$depId' for '$($Task.id)'"}; if(-not (Test-IsDependencyCompleteState (Get-TaskRuntimeState $depId $RuntimeState).state)){return $false} }; return $true
 }
-function Resolve-DependencyStates($Tasks,$RuntimeState){$changed=$false;foreach($t in $Tasks){$s=Get-TaskRuntimeState $t.id $RuntimeState;if($s.state -eq "BLOCKED" -and (Test-DependenciesSatisfied $t $Tasks $RuntimeState)){Write-Host "$($t.id): BLOCKED -> READY";$s.state="READY";$changed=$true}};$changed}
+function Resolve-DependencyStates($Tasks,$RuntimeState){
+    $changed=$false
+    foreach($t in $Tasks){
+        $s=Get-TaskRuntimeState $t.id $RuntimeState
+
+        # Backward compatibility: only infer dependency blocking for old state
+        # when the task actually declares dependencies.
+        if(
+            $s.state -eq "BLOCKED" -and
+            -not $s.blockKind -and
+            $t.dependencies -and
+            @($t.dependencies).Count -gt 0
+        ){
+            $s.blockKind="DEPENDENCY"
+        }
+
+        if(
+            $s.state -eq "BLOCKED" -and
+            $s.blockKind -eq "DEPENDENCY" -and
+            (Test-DependenciesSatisfied $t $Tasks $RuntimeState)
+        ){
+            Write-Host "$($t.id): dependency BLOCKED -> READY"
+            $s.state="READY"
+            $s.blockKind=$null
+            $changed=$true
+        }
+    }
+    return $changed
+}
 
 function Get-ProcessByIdSafe([int]$ProcessId){Get-Process -Id $ProcessId -ErrorAction SilentlyContinue}
 function Test-ProcessIdentityMatches($Process,$ExpectedStartTime){if(-not $ExpectedStartTime){return $true};try{$e=[DateTime]::Parse($ExpectedStartTime).ToUniversalTime();$a=$Process.StartTime.ToUniversalTime();[Math]::Abs(($a-$e).TotalSeconds)-lt 2}catch{$false}}
 function Get-ExitCodeFile([string]$Path){if(-not(Test-Path $Path)){return $null};try{$v=(Get-Content $Path -Raw).Trim();if($v -match '^-?\d+$'){return [int]$v}}catch{};$null}
 function Stop-ProcessTree([int]$ProcessId){$null=& cmd.exe /d /s /c "taskkill /PID $ProcessId /T /F >nul 2>&1"}
-function Complete-Recovered($State,[int]$ExitCode,[string]$Id){$State.lastExitCode=$ExitCode;$State.completedAt=Now-Utc;$State.processId=$null;$State.processStartTime=$null;if($ExitCode -eq 0){$State.state="VALIDATION_PENDING";$State.lastFailureReason=$null;Write-Host "$Id: recovered -> VALIDATION_PENDING"}else{$State.state="FAILED";$State.lastFailureReason="Recovered worker exited $ExitCode";Write-Host "$Id: recovered -> FAILED"}}
+function Complete-Recovered($State,[int]$ExitCode,[string]$Id){$State.lastExitCode=$ExitCode;$State.completedAt=Now-Utc;$State.processId=$null;$State.processStartTime=$null;if($ExitCode -eq 0){$State.state="VALIDATION_PENDING";$State.lastFailureReason=$null;Write-Host "${Id}: recovered -> VALIDATION_PENDING"}else{$State.state="FAILED";$State.lastFailureReason="Recovered worker exited $ExitCode";Write-Host "${Id}: recovered -> FAILED"}}
 function Repair-StaleRunningTasks($Tasks,$RuntimeState,$Settings){
     $changed=$false;foreach($t in $Tasks){$s=Get-TaskRuntimeState $t.id $RuntimeState;if($s.state -notin @("RUNNING","FIXING","CI_FIXING")){continue};$ep=$s.exitCodePath;if(-not $ep){$ep=Join-Path $logDirectory "$($t.id)-exitcode.txt";$s.exitCodePath=$ep}
         if(-not $s.processId){$ec=Get-ExitCodeFile $ep;if($null -ne $ec){Complete-Recovered $s $ec $t.id}else{$s.state="FAILED";$s.completedAt=Now-Utc;$s.lastFailureReason="Stale active state without PID/exit artifact."};$changed=$true;continue}
@@ -126,9 +154,69 @@ function Repair-StaleRunningTasks($Tasks,$RuntimeState,$Settings){
 }
 
 function Ensure-Worktree($Task,[string]$ProjectParent,[string]$Root){
-    if(-not $Task.branch -or -not $Task.worktreeName){throw "$($Task.id): branch/worktree config missing."};$path=Join-Path $ProjectParent $Task.worktreeName;$current=$null;$found=$null
-    foreach($line in (& git -C $Root worktree list --porcelain)){if($line -match '^worktree (.+)$'){$current=$Matches[1]}elseif($line -eq "branch refs/heads/$($Task.branch)"){$found=$current;break}}
-    if($found){return [string]$found};if(Test-Path $path){return [string]$path};Push-Location $Root;try{& git show-ref --verify --quiet "refs/heads/$($Task.branch)";if($LASTEXITCODE -eq 0){& git worktree add $path $Task.branch}else{& git worktree add $path -b $Task.branch};if($LASTEXITCODE -ne 0){throw "git worktree add failed."}}finally{Pop-Location};[string]$path
+    if(-not $Task.branch -or -not $Task.worktreeName){
+        throw "$($Task.id): branch/worktree config missing"
+    }
+
+    [string]$path = Join-Path $ProjectParent $Task.worktreeName
+    $found = $null
+    $current = $null
+
+    foreach($line in (& git -C $Root worktree list --porcelain)){
+        if($line -match '^worktree (.+)$'){
+            $current = $Matches[1]
+        }
+        elseif($line -eq "branch refs/heads/$($Task.branch)"){
+            $found = $current
+            break
+        }
+    }
+
+    if($found){
+        Write-Host "$($Task.id): existing Git worktree found."
+        Write-Host "$($Task.id): reusing $found"
+        return [string]$found
+    }
+
+    if(Test-Path $path){
+        Write-Host "$($Task.id): worktree directory already exists."
+        Write-Host "$($Task.id): reusing $path"
+        return [string]$path
+    }
+
+    Push-Location $Root
+    try{
+        & git show-ref --verify --quiet "refs/heads/$($Task.branch)"
+        $branchExists = ($LASTEXITCODE -eq 0)
+
+        if($branchExists){
+            Write-Host "$($Task.id): existing branch found."
+            $gitOutput = @(& git worktree add $path $Task.branch 2>&1)
+        }
+        else{
+            Write-Host "$($Task.id): creating branch and worktree."
+            $gitOutput = @(& git worktree add $path -b $Task.branch 2>&1)
+        }
+
+        $gitExitCode = $LASTEXITCODE
+
+        foreach($outputLine in $gitOutput){
+            Write-Host $outputLine
+        }
+
+        if($gitExitCode -ne 0){
+            throw "git worktree add failed with exit code $gitExitCode."
+        }
+    }
+    finally{
+        Pop-Location
+    }
+
+    if(-not (Test-Path $path)){
+        throw "$($Task.id): expected worktree path was not created: $path"
+    }
+
+    return [string]$path
 }
 function Get-WorktreeBranch([string]$Path){Push-Location $Path;try{(& git branch --show-current).Trim()}finally{Pop-Location}}
 function Get-WorktreeHead([string]$Path){Push-Location $Path;try{(& git rev-parse HEAD).Trim()}finally{Pop-Location}}
@@ -281,9 +369,9 @@ function Rollback-Integration([string]$Root,[string]$Sha){if(-not(Test-RootClean
 function Validate-CompletedWorker($Task,$State,$Workers,$Settings,$RuntimeState,[string]$StateFile){
     $wt=if($State.worktreePath){[string]$State.worktreePath}else{Join-Path $projectParent $Task.worktreeName};if(-not(Test-Path $wt)){$State.state="FAILED";$State.lastFailureReason="Worktree missing during validation";Save-RuntimeState $RuntimeState $StateFile;return}
     $rp=Join-Path $wt ".agent-result.json";$State.agentResultPath=$rp;$r=Get-AgentResult $rp;$v=Test-AgentResult $r $Task;if(-not$v.Valid){$State.state="FAILED";$State.lastFailureReason="Invalid agent result: "+($v.Errors-join"; ");Save-RuntimeState $RuntimeState $StateFile;return}
-    if($r.outcome-eq"BLOCKED"){$State.state="BLOCKED";$State.lastFailureReason=if(@($r.blockers).Count){@($r.blockers)-join"; "}else{$r.summary};Save-RuntimeState $RuntimeState $StateFile;return};if($r.outcome-eq"FAILED"){$State.state="FAILED";$State.lastFailureReason=$r.summary;Save-RuntimeState $RuntimeState $StateFile;return};if($r.scopeRespected-ne$true){$State.state="FAILED";$State.lastFailureReason="Agent reported scope violation";Save-RuntimeState $RuntimeState $StateFile;return};if(-not(Test-AgentVerification $r)){$State.state="FAILED";$State.lastFailureReason="Agent reported failed verification";Save-RuntimeState $RuntimeState $StateFile;return}
+    if($r.outcome-eq"BLOCKED"){$State.state="BLOCKED";$State.blockKind="WORKER";$State.lastFailureReason=if(@($r.blockers).Count){@($r.blockers)-join"; "}else{$r.summary};Save-RuntimeState $RuntimeState $StateFile;return};if($r.outcome-eq"FAILED"){$State.state="FAILED";$State.lastFailureReason=$r.summary;Save-RuntimeState $RuntimeState $StateFile;return};if($r.scopeRespected-ne$true){$State.state="FAILED";$State.lastFailureReason="Agent reported scope violation";Save-RuntimeState $RuntimeState $StateFile;return};if(-not(Test-AgentVerification $r)){$State.state="FAILED";$State.lastFailureReason="Agent reported failed verification";Save-RuntimeState $RuntimeState $StateFile;return}
     $actual=Get-ChangedFiles $wt;$scope=Test-Scope $actual $Task;if(-not$scope.Valid){$State.state="FAILED";$State.lastFailureReason="Git scope violation: "+($scope.Violations-join", ");Save-RuntimeState $RuntimeState $StateFile;return};$claims=Test-ClaimedFiles $r $actual -AllowAdditionalActual:($State.executionMode-in@("FIX","CIFIX"));if(-not$claims.Matches){$State.state="FAILED";$State.lastFailureReason="filesChanged does not match Git changes";Save-RuntimeState $RuntimeState $StateFile;return}
-    $State.state="IMPLEMENTED";Save-RuntimeState $RuntimeState $StateFile;Write-Host "$($Task.id): structured result accepted -> IMPLEMENTED";$State.state="VERIFYING";Save-RuntimeState $RuntimeState $StateFile;$ver=Invoke-Verifier $Task $wt $Workers.workers $Settings;$State.verifierResultPath=$ver.resultPath;if($ver.blocked){$State.state="BLOCKED";$State.lastFailureReason=$ver.reason;Save-RuntimeState $RuntimeState $StateFile;return};if(-not$ver.passed){$State.state="VERIFICATION_FAILED";$State.lastFailureReason=$ver.reason;Save-RuntimeState $RuntimeState $StateFile;return}
+    $State.state="IMPLEMENTED";Save-RuntimeState $RuntimeState $StateFile;Write-Host "$($Task.id): structured result accepted -> IMPLEMENTED";$State.state="VERIFYING";Save-RuntimeState $RuntimeState $StateFile;$ver=Invoke-Verifier $Task $wt $Workers.workers $Settings;$State.verifierResultPath=$ver.resultPath;if($ver.blocked){$State.state="BLOCKED";$State.blockKind="VERIFIER";$State.lastFailureReason=$ver.reason;Save-RuntimeState $RuntimeState $StateFile;return};if(-not$ver.passed){$State.state="VERIFICATION_FAILED";$State.lastFailureReason=$ver.reason;Save-RuntimeState $RuntimeState $StateFile;return}
     $State.state="ORCHESTRATOR_VERIFYING";Save-RuntimeState $RuntimeState $StateFile;$det=Invoke-TaskVerification $Task $wt $Settings;$State.verificationResultPath=Save-VerificationResult $Task $det;if(-not$det.passed){$f=@($det.results|Where-Object{-not$_.passed})|Select-Object -First 1;$State.state="VERIFICATION_FAILED";$State.lastFailureReason="Deterministic verification failed: $($f.command) exited $($f.exitCode)";Save-RuntimeState $RuntimeState $StateFile;return}
     if($State.executionMode-eq"CIFIX"){$c=Commit-Worktree $Task $wt (Get-CiFixCommitMessage $Task);if(-not$c.success){$State.state="FAILED";$State.lastFailureReason="CI fix could not commit: $($c.reason)";Save-RuntimeState $RuntimeState $StateFile;return};$p=Push-Task $Task $wt ([string]$Settings.gitRemote) $c.commit;if(-not$p.success){$State.state="CI_FAILED";$State.commitSha=$c.commit;$State.lastCiFailureReason="CI fix push failed: $($p.reason)";Save-RuntimeState $RuntimeState $StateFile;return};$State.commitSha=$c.commit;$State.remoteBranch=$Task.branch;$State.state="CI_RUNNING";$State.ciState="RUNNING";$State.lastCiFailureReason=$null;$State.lastFailureReason=$null;Save-RuntimeState $RuntimeState $StateFile;Write-Host "$($Task.id): CI fix committed/pushed -> CI_RUNNING";return}
     $State.state="REVIEW";$State.lastFailureReason=$null;Save-RuntimeState $RuntimeState $StateFile;Write-Host "$($Task.id): verification pipeline passed -> REVIEW"
@@ -310,13 +398,13 @@ if($TaskId){$requestedTask=Get-TaskById $TaskId $data.tasks;if(-not$requestedTas
 
 if($Command-eq"status"){Show-Status $data.tasks $runtimeState $settings;return}
 if($Command-eq"retry"){
-    if($requestedState.state-notin@("FAILED","VERIFICATION_FAILED")){throw "$TaskId is not retryable."};if([int]$requestedState.attempts-ge[int]$settings.maxAttempts){throw "Max attempts reached."};$requestedState.state="READY";$requestedState.approved=$false;$requestedState.approvedAt=$null;$requestedState.lastExitCode=$null;$requestedState.completedAt=$null;$requestedState.processId=$null;$requestedState.processStartTime=$null;$requestedState.lastFailureReason=$null;$requestedState.executionMode=$null;Save-RuntimeState $runtimeState $stateFile;Write-Host "$TaskId -> READY";return
+    if($requestedState.state-notin@("FAILED","VERIFICATION_FAILED")){throw "$TaskId is not retryable."};if([int]$requestedState.attempts-ge[int]$settings.maxAttempts){throw "Max attempts reached."};$requestedState.state="READY";$requestedState.blockKind=$null;$requestedState.approved=$false;$requestedState.approvedAt=$null;$requestedState.lastExitCode=$null;$requestedState.completedAt=$null;$requestedState.processId=$null;$requestedState.processStartTime=$null;$requestedState.lastFailureReason=$null;$requestedState.executionMode=$null;Save-RuntimeState $runtimeState $stateFile;Write-Host "$TaskId -> READY";return
 }
 if($Command-eq"cancel"){
     if($requestedState.state-notin@("RUNNING","FIXING","CI_FIXING")){throw "$TaskId is not running."};if($requestedState.processId){$p=Get-ProcessByIdSafe ([int]$requestedState.processId);if($p-and(Test-ProcessIdentityMatches $p $requestedState.processStartTime)){Stop-ProcessTree ([int]$requestedState.processId)}};$requestedState.state="FAILED";$requestedState.lastExitCode=-499;$requestedState.lastFailureReason="Worker cancelled by human.";$requestedState.processId=$null;$requestedState.processStartTime=$null;$requestedState.completedAt=Now-Utc;Save-RuntimeState $runtimeState $stateFile;Write-Host "$TaskId cancelled.";return
 }
 if($Command-eq"approve"){
-    if($requestedState.state-ne"REVIEW"){throw "$TaskId is not REVIEW."};$requestedState.state="COMMIT_READY";$requestedState.approved=$true;$requestedState.approvedAt=Now-Utc;$requestedState.lastFailureReason=$null;Save-RuntimeState $runtimeState $stateFile;Write-Host "$TaskId: REVIEW -> COMMIT_READY";Write-Host "Next: -Command commit -TaskId $TaskId";return
+    if($requestedState.state-ne"REVIEW"){throw "$TaskId is not REVIEW."};$requestedState.state="COMMIT_READY";$requestedState.approved=$true;$requestedState.approvedAt=Now-Utc;$requestedState.lastFailureReason=$null;Save-RuntimeState $runtimeState $stateFile;Write-Host "${TaskId}: REVIEW -> COMMIT_READY";Write-Host "Next: -Command commit -TaskId $TaskId";return
 }
 if($Command-eq"fix"){
     if($requestedState.state-ne"VERIFICATION_FAILED"){throw "$TaskId is not VERIFICATION_FAILED."};if([int]$requestedState.fixAttempts-ge[int]$settings.maxFixAttempts){throw "Max fix attempts reached."};$requestedState.lastFixReason=$requestedState.lastFailureReason;$requestedState.state="FIX_REQUIRED";Save-RuntimeState $runtimeState $stateFile;Write-Host "$TaskId -> FIX_REQUIRED. Run -Command run.";return
@@ -325,19 +413,19 @@ if($Command-eq"verify"){
     $wt=if($requestedState.worktreePath){$requestedState.worktreePath}else{Join-Path $projectParent $requestedTask.worktreeName};$r=Invoke-TaskVerification $requestedTask $wt $settings;$p=Save-VerificationResult $requestedTask $r;Write-Host "Verification passed: $($r.passed)";Write-Host "Result: $p";return
 }
 if($Command-eq"commit"){
-    if($requestedState.state-ne"COMMIT_READY"){throw "$TaskId is not COMMIT_READY."};$wt=if($requestedState.worktreePath){$requestedState.worktreePath}else{Join-Path $projectParent $requestedTask.worktreeName};$r=Commit-Worktree $requestedTask $wt (Get-CommitMessage $requestedTask) -AllowClean;if(-not$r.success){throw $r.reason};$requestedState.commitSha=$r.commit;$requestedState.state="PUSH_READY";Save-RuntimeState $runtimeState $stateFile;Write-Host "$TaskId: COMMIT_READY -> PUSH_READY ($($r.commit))";return
+    if($requestedState.state-ne"COMMIT_READY"){throw "$TaskId is not COMMIT_READY."};$wt=if($requestedState.worktreePath){$requestedState.worktreePath}else{Join-Path $projectParent $requestedTask.worktreeName};$r=Commit-Worktree $requestedTask $wt (Get-CommitMessage $requestedTask) -AllowClean;if(-not$r.success){throw $r.reason};$requestedState.commitSha=$r.commit;$requestedState.state="PUSH_READY";Save-RuntimeState $runtimeState $stateFile;Write-Host "${TaskId}: COMMIT_READY -> PUSH_READY ($($r.commit))";return
 }
 if($Command-eq"push"){
-    if($requestedState.state-ne"PUSH_READY"){throw "$TaskId is not PUSH_READY."};$remote=[string]$settings.gitRemote;if(-not(Test-Remote $root $remote)){throw "Remote '$remote' not found."};$wt=if($requestedState.worktreePath){$requestedState.worktreePath}else{Join-Path $projectParent $requestedTask.worktreeName};$r=Push-Task $requestedTask $wt $remote $requestedState.commitSha;if(-not$r.success){throw $r.reason};$requestedState.remoteBranch=$requestedTask.branch;$requestedState.state="PR_READY";Save-RuntimeState $runtimeState $stateFile;Write-Host "$TaskId: PUSH_READY -> PR_READY";return
+    if($requestedState.state-ne"PUSH_READY"){throw "$TaskId is not PUSH_READY."};$remote=[string]$settings.gitRemote;if(-not(Test-Remote $root $remote)){throw "Remote '$remote' not found."};$wt=if($requestedState.worktreePath){$requestedState.worktreePath}else{Join-Path $projectParent $requestedTask.worktreeName};$r=Push-Task $requestedTask $wt $remote $requestedState.commitSha;if(-not$r.success){throw $r.reason};$requestedState.remoteBranch=$requestedTask.branch;$requestedState.state="PR_READY";Save-RuntimeState $runtimeState $stateFile;Write-Host "${TaskId}: PUSH_READY -> PR_READY";return
 }
 if($Command-eq"create-pr"){
-    if($requestedState.state-notin@("PR_READY","PR_OPEN")){throw "$TaskId is not PR_READY."};$pr=Create-Pr $requestedTask $root $settings;$requestedState.pullRequestNumber=[int]$pr.number;$requestedState.pullRequestUrl=[string]$pr.url;$requestedState.state="PR_OPEN";$requestedState.ciState="PENDING";Save-RuntimeState $runtimeState $stateFile;Write-Host "$TaskId: PR_OPEN #$($pr.number) $($pr.url)";return
+    if($requestedState.state-notin@("PR_READY","PR_OPEN")){throw "$TaskId is not PR_READY."};$pr=Create-Pr $requestedTask $root $settings;$requestedState.pullRequestNumber=[int]$pr.number;$requestedState.pullRequestUrl=[string]$pr.url;$requestedState.state="PR_OPEN";$requestedState.ciState="PENDING";Save-RuntimeState $runtimeState $stateFile;Write-Host "${TaskId}: PR_OPEN #$($pr.number) $($pr.url)";return
 }
 if($Command-eq"check-ci"){
-    if(-not$requestedState.pullRequestNumber){throw "$TaskId has no PR."};$ci=Get-CiStatus ([int]$requestedState.pullRequestNumber) $root;$requestedState.lastCiCheckedAt=Now-Utc;if($ci.state-eq"MERGED"){$requestedState.state="MERGED";$requestedState.ciState="PASSED";if($ci.pr.mergeCommit -and $ci.pr.mergeCommit.oid){$requestedState.integrationSha=[string]$ci.pr.mergeCommit.oid};$requestedState.integratedAt=if($ci.pr.mergedAt){[string]$ci.pr.mergedAt}else{Now-Utc};$null=Resolve-DependencyStates $data.tasks $runtimeState;Save-RuntimeState $runtimeState $stateFile;Write-Host "$TaskId: PR MERGED";return};if($ci.state-in@("PENDING","RUNNING")){$requestedState.state="CI_RUNNING";$requestedState.ciState=$ci.state;Write-Host "$TaskId: CI $($ci.state)"}elseif($ci.state-eq"PASSED"){$requestedState.state="MERGE_READY";$requestedState.ciState="PASSED";$requestedState.lastCiFailureReason=$null;Write-Host "$TaskId: CI PASSED -> MERGE_READY. Merge in GitHub after human review."}else{$requestedState.state="CI_FAILED";$requestedState.ciState="FAILED";$names=@($ci.checks|Where-Object{(Get-CheckState $_)-eq"FAILED"}|ForEach-Object{Get-CheckName $_});$requestedState.lastCiFailureReason=if($names.Count){"Failed checks: "+($names-join", ")}else{"CI failed"};Write-Host "$TaskId: CI_FAILED - $($requestedState.lastCiFailureReason)"};Save-RuntimeState $runtimeState $stateFile;return
+    if(-not$requestedState.pullRequestNumber){throw "$TaskId has no PR."};$ci=Get-CiStatus ([int]$requestedState.pullRequestNumber) $root;$requestedState.lastCiCheckedAt=Now-Utc;if($ci.state-eq"MERGED"){$requestedState.state="MERGED";$requestedState.ciState="PASSED";if($ci.pr.mergeCommit -and $ci.pr.mergeCommit.oid){$requestedState.integrationSha=[string]$ci.pr.mergeCommit.oid};$requestedState.integratedAt=if($ci.pr.mergedAt){[string]$ci.pr.mergedAt}else{Now-Utc};$null=Resolve-DependencyStates $data.tasks $runtimeState;Save-RuntimeState $runtimeState $stateFile;Write-Host "${TaskId}: PR MERGED";return};if($ci.state-in@("PENDING","RUNNING")){$requestedState.state="CI_RUNNING";$requestedState.ciState=$ci.state;Write-Host "${TaskId}: CI $($ci.state)"}elseif($ci.state-eq"PASSED"){$requestedState.state="MERGE_READY";$requestedState.ciState="PASSED";$requestedState.lastCiFailureReason=$null;Write-Host "${TaskId}: CI PASSED -> MERGE_READY. Merge in GitHub after human review."}else{$requestedState.state="CI_FAILED";$requestedState.ciState="FAILED";$names=@($ci.checks|Where-Object{(Get-CheckState $_)-eq"FAILED"}|ForEach-Object{Get-CheckName $_});$requestedState.lastCiFailureReason=if($names.Count){"Failed checks: "+($names-join", ")}else{"CI failed"};Write-Host "${TaskId}: CI_FAILED - $($requestedState.lastCiFailureReason)"};Save-RuntimeState $runtimeState $stateFile;return
 }
 if($Command-eq"ci-fix"){
-    if($requestedState.state-ne"CI_FAILED"){throw "$TaskId is not CI_FAILED."};if([int]$requestedState.ciFixAttempts-ge[int]$settings.maxCiFixAttempts){throw "Max CI fix attempts reached."};$f=Get-LatestCiFailure $requestedTask $root $settings;if(-not$f){throw "Could not retrieve failed CI logs."};$cat=Get-CiCategory $f.log;if($cat-eq"INFRASTRUCTURE_OR_NETWORK"){Write-Host "Infrastructure/network failure detected; source repair not scheduled. Rerun CI manually.";return};$p=Join-Path $generatedDirectory "$TaskId-ci-failure.txt";Set-Content $p $f.log -Encoding UTF8;$requestedState.ciRunId=$f.runId;$requestedState.ciFailureLogPath=$p;$requestedState.lastCiFailureReason="$cat - $($requestedState.lastCiFailureReason)";$requestedState.state="CI_FIX_REQUIRED";Save-RuntimeState $runtimeState $stateFile;Write-Host "$TaskId: CI_FAILED -> CI_FIX_REQUIRED. Run -Command run.";return
+    if($requestedState.state-ne"CI_FAILED"){throw "$TaskId is not CI_FAILED."};if([int]$requestedState.ciFixAttempts-ge[int]$settings.maxCiFixAttempts){throw "Max CI fix attempts reached."};$f=Get-LatestCiFailure $requestedTask $root $settings;if(-not$f){throw "Could not retrieve failed CI logs."};$cat=Get-CiCategory $f.log;if($cat-eq"INFRASTRUCTURE_OR_NETWORK"){Write-Host "Infrastructure/network failure detected; source repair not scheduled. Rerun CI manually.";return};$p=Join-Path $generatedDirectory "$TaskId-ci-failure.txt";Set-Content $p $f.log -Encoding UTF8;$requestedState.ciRunId=$f.runId;$requestedState.ciFailureLogPath=$p;$requestedState.lastCiFailureReason="$cat - $($requestedState.lastCiFailureReason)";$requestedState.state="CI_FIX_REQUIRED";Save-RuntimeState $runtimeState $stateFile;Write-Host "${TaskId}: CI_FAILED -> CI_FIX_REQUIRED. Run -Command run.";return
 }
 
 # Optional local merge path retained for Stages 30-31. PR flow is preferred from Stage 32 onward.
