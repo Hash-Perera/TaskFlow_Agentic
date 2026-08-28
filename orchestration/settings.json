@@ -1,6 +1,21 @@
 {
   "maxParallelWorkers": 2,
   "workerTimeoutMinutes": 20,
+  "verificationTimeoutMinutes": 10,
+  "integrationVerificationTimeoutMinutes": 20,
   "maxAttempts": 3,
-  "pollIntervalSeconds": 2
+  "maxFixAttempts": 2,
+  "maxCiFixAttempts": 2,
+  "pollIntervalSeconds": 2,
+  "ciFailureLogLines": 120,
+  "baseBranch": "main",
+  "gitRemote": "origin",
+  "verifierWorkerId": "verification-worker",
+  "integrationVerificationCommand": ".\\scripts\\verify.ps1",
+  "allowedVerificationCommandPrefixes": [
+    "npm ",
+    "npx ",
+    "dotnet ",
+    "node "
+  ]
 }

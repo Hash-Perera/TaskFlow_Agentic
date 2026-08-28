@@ -38,6 +38,9 @@ mongodb-data/
 *.tmp
 *.temp
 
-# orchestration/generated/
-# orchestration/logs/
+.agent-result.json
+.verifier-result.json
 orchestration/state.json
+orchestration/logs/
+orchestration/generated/
+orchestration/verification/

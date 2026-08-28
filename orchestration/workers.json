@@ -35,6 +35,15 @@
         "docs/**",
         "AGENTS.md"
       ]
+    },
+    {
+      "id": "verification-worker",
+      "role": "Independent Verification Worker",
+      "allowedScope": [],
+      "forbiddenScope": [
+        "**"
+      ],
+      "readOnly": true
     }
   ]
 }

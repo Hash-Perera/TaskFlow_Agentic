@@ -35,6 +35,22 @@
       "scope": ["backend/taskflow-api/test/**"],
       "verification": ["npm test"],
       "humanApprovalRequired": true
+    },
+    {
+    "id": "TASK-001",
+    "name": "Backend CRUD",
+    "owner": "backend-worker",
+    "verificationWorker": "verification-worker",
+    "dependencies": [],
+    "branch": "agent/task-001-backend-crud",
+    "worktreeName": "TaskFlow-agent-backend",
+    "scope": [
+      "backend/taskflow-api/**"
+    ],
+    "verification": [
+      "npm run build",
+      "npm test"
+    ]
     }
   ]
 }

@@ -1,0 +1,72 @@
+{
+  "type": "object",
+  "required": [
+    "taskId",
+    "outcome",
+    "summary",
+    "filesChanged",
+    "verification",
+    "scopeRespected",
+    "blockers",
+    "unresolvedIssues"
+  ],
+  "properties": {
+    "taskId": {
+      "type": "string"
+    },
+    "outcome": {
+      "type": "string",
+      "enum": [
+        "SUCCESS",
+        "BLOCKED",
+        "FAILED"
+      ]
+    },
+    "summary": {
+      "type": "string"
+    },
+    "filesChanged": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "verification": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "command",
+          "passed",
+          "details"
+        ],
+        "properties": {
+          "command": {
+            "type": "string"
+          },
+          "passed": {
+            "type": "boolean"
+          },
+          "details": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "scopeRespected": {
+      "type": "boolean"
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "unresolvedIssues": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
